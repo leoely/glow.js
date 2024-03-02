@@ -17,20 +17,20 @@ class LocationLexer extends Lexer {
           (code >= 33 && code <= 44) ||
           (code >= 125 && code <= 153)
         ) {
-          this.elem = [];
-          this.elem.push(char);
+          this.elems = [];
+          this.elems.push(char);
           this.status = 2;
           return;
         }
         switch (char) {
           case '/':
-            this.ans.push(this.makeLexer('/'));
+            this.ans.push(this.makeLexer('symbol', '/'));
             return this.quit();
           case ':':
-            this.ans.push(this.makeLexer(':'));
+            this.ans.push(this.makeLexer('symbol', ':'));
             return this.quit();
           case '.':
-            this.ans.push(this.makeLexer('.'));
+            this.ans.push(this.makeLexer('symbol', '.'));
             return this.quit();
           default:
             return this.quit();
@@ -48,14 +48,14 @@ class LocationLexer extends Lexer {
             (code >= 33 && code <= 44) ||
             (code >= 125 && code <= 153)
           ) {
-            if (this.elem === undefined) {
-              this.elem = [];
+            if (this.elems === undefined) {
+              this.elems = [];
             }
-            this.elem.push(char);
+            this.elems.push(char);
             return;
           }
         }
-        this.ans.push(this.makeLexer('namespace', this.elem.join('')));
+        this.ans.push(this.makeLexer('namespace', this.elems.join('')));
         return this.quit();
         break;
       }

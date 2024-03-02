@@ -6,6 +6,6 @@ describe('[class] VersionLexer', () => {
   test('VersionLexer parse result should be correct.', () => {
     const highLight = new HighLight();
     highLight.addLexer(VersionLexer);
-    expect(JSON.stringify(highLight.parse('v0.0.1'))).toMatch('[{\"type\":\"v\"},{\"type\":\"version\",\"elem\":\"0\"},{\"type\":\".\"},{\"type\":\"version\",\"elem\":\"0\"},{\"type\":\".\"},{\"type\":\"version\",\"elem\":\"1\"}]');
+    expect(JSON.stringify(highLight.parse('v0.0.1'))).toMatch('[{\"type\":\"symbol\",\"elem\":\"v\"},{\"type\":\"version\",\"elem\":\"0\"},{\"type\":\"symbol\",\"elem\":\".\"},{\"type\":\"version\",\"elem\":\"0\"},{\"type\":\"symbol\",\"elem\":\".\"},{\"type\":\"version\",\"elem\":\"1\"}]');
   });
 });

@@ -10,17 +10,17 @@ class ShellLexer extends Lexer {
       case 0:
         switch (char) {
           case 'n':
-            this.elem = [];
-            this.elem.push(char);
+            this.elems = [];
+            this.elems.push(char);
             this.status = 1;
             break;
           case 'c':
-            this.elem = [];
-            this.elem.push(char);
+            this.elems = [];
+            this.elems.push(char);
             this.status = 2;
             break;
           case '-':
-            this.ans.push(this.makeLexer('-'));
+            this.ans.push(this.makeLexer('symbol', '-'));
             return this.quit();
             break;
           case '|':
@@ -32,25 +32,25 @@ class ShellLexer extends Lexer {
         }
         break;
       case 1:
-        switch (this.elem.length) {
+        switch (this.elems.length) {
           case 1:
             if (char === 'o') {
-              this.elem.push(char);
+              this.elems.push(char);
             } else {
               return this.quit();
             }
             break;
           case 2:
             if (char === 'd') {
-              this.elem.push('d');
+              this.elems.push('d');
             } else {
               return this.quit();
             }
             break;
           case 3:
             if (char === 'e') {
-              this.elem.push(char)
-              this.ans.push(this.makeLexer('command', this.elem.join('')));
+              this.elems.push(char)
+              this.ans.push(this.makeLexer('command', this.elems.join('')));
               return this.quit();
             } else {
               return this.quit();
@@ -61,25 +61,25 @@ class ShellLexer extends Lexer {
         }
         break;
       case 2:
-        switch (this.elem.length) {
+        switch (this.elems.length) {
           case 1:
             if (char === 'u') {
-              this.elem.push(char);
+              this.elems.push(char);
             } else {
               return this.quit();
             }
             break;
           case 2:
             if (char === 'r') {
-              this.elem.push('r');
+              this.elems.push('r');
             } else {
               return this.quit();
             }
             break;
           case 3:
             if (char === 'l') {
-              this.elem.push(char);
-              this.ans.push(this.makeLexer('command', this.elem.join('')));
+              this.elems.push(char);
+              this.ans.push(this.makeLexer('command', this.elems.join('')));
               return this.quit();
             } else {
               return this.quit();
@@ -92,7 +92,7 @@ class ShellLexer extends Lexer {
       case 4:
         switch (char) {
           case ' ':
-            this.ans.push(this.makeLexer('|'));
+            this.ans.push(this.makeLexer('symbol', '|'));
             return this.quit();
           case 'EOF':
             return this.quit();

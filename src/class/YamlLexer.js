@@ -25,6 +25,12 @@ class YamlLexer extends Lexer {
           this.status = 1;
           return;
         }
+        if (code >= 48 && code <= 57) {
+          this.elem = [];
+          this.elem.push(char);
+          this.status = 5;
+          return;
+        }
         switch (char) {
           case '"':
             this.ans.push(this.makeLexer('"'));
@@ -33,6 +39,9 @@ class YamlLexer extends Lexer {
             break;
           case '-':
             this.ans.push(this.makeLexer('-'));
+            return this.quit();
+          case '.':
+            this.ans.push(this.makeLexer('.'));
             return this.quit();
           case '(':
             this.elem = [];
@@ -68,10 +77,6 @@ class YamlLexer extends Lexer {
         if (char === '\n' || char === 'EOF') {
           this.ans.push(this.makeLexer('comment', this.elem.join('')));
           return this.quit();
-        } else if (char === ' ') {
-          this.ans.push(this.makeLexer('comment', this.elem.join('')));
-          this.elem = [];
-          return;
         } else {
           this.elem.push(char);
         }
@@ -84,6 +89,16 @@ class YamlLexer extends Lexer {
           return this.quit();
         } else {
           this.elem.push(char);
+        }
+        break;
+      }
+      case 5: {
+        const code = char.charCodeAt(0);
+        if (code >= 48 && code <= 57) {
+          this.elem.push(char);
+        } else {
+          this.ans.push(this.makeLexer('number', this.elem.join('')));
+          return this.quit();
         }
         break;
       }

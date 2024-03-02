@@ -18,21 +18,21 @@ class JavascriptLexer extends Lexer {
             this.ans.push(this.makeLexer('.'));
             return this.quit();
           case '(':
-            this.ans.push(this.makeLexer('('));
+            this.ans.push(this.makeLexer('parenthese', '('));
             return this.quit();
           case ')':
             if (!this.checkLexerDuplicate(')')) {
-              this.ans.push(this.makeLexer(')'));
+              this.ans.push(this.makeLexer('parenthese', ')'));
               return this.quit();
             }
           case '{':
             if (!this.checkLexerDuplicate('{')) {
-              this.ans.push(this.makeLexer('{'));
+              this.ans.push(this.makeLexer('bigParenthese', '{'));
               return this.quit();
             }
           case '}':
             if (!this.checkLexerDuplicate('}')) {
-              this.ans.push(this.makeLexer('}'));
+              this.ans.push(this.makeLexer('bigParenthese', '}'));
               return this.quit();
             }
           case ';':

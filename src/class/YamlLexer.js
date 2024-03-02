@@ -33,12 +33,12 @@ class YamlLexer extends Lexer {
         }
         switch (char) {
           case '"':
-            this.ans.push(this.makeLexer('symbol', '"'));
+            this.ans.push(this.makeLexer('string', '"'));
             this.elems = [];
             this.status = 2;
             break;
           case '-':
-            this.ans.push(this.makeLexer('symbol', '-'));
+            this.ans.push(this.makeLexer('list', '-'));
             return this.quit();
           case '.':
             this.ans.push(this.makeLexer('symbol', '.'));
@@ -55,7 +55,7 @@ class YamlLexer extends Lexer {
       case 1:
         if (char === ':') {
           this.ans.push(this.makeLexer('key', this.elems.join('')));
-          this.ans.push(this.makeLexer('symbol', ':'));
+          this.ans.push(this.makeLexer('definition', ':'));
           return this.quit();
         } else {
           if (char === ' ' || char === '\n' || char === 'EOF') {

@@ -65,7 +65,7 @@ class JavascriptLexer extends Lexer {
           case '"': {
             if (!this.checkLexerDuplicate('"')) {
               this.elems = [];
-              this.ans.push(this.makeLexer('symbol', '"'));
+              this.ans.push(this.makeLexer('quotation', '"'));
               this.status = 3;
               return;
             }
@@ -73,7 +73,7 @@ class JavascriptLexer extends Lexer {
           case "'": {
             if (!this.checkLexerDuplicate("'")) {
               this.elems = [];
-              this.ans.push(this.makeLexer('symbol', "'"));
+              this.ans.push(this.makeLexer('quotation', "'"));
               this.status = 4;
               break;
             }
@@ -201,7 +201,7 @@ class JavascriptLexer extends Lexer {
       case 3: {
         if (char === '"') {
           this.ans.push(this.makeLexer('string', this.elems.join('')));
-          this.ans.push(this.makeLexer('symbol', '"'));
+          this.ans.push(this.makeLexer('quotation', '"'));
           return this.quit();
         } else {
           this.elems.push(char);
@@ -211,7 +211,7 @@ class JavascriptLexer extends Lexer {
       case 4: {
         if (char === "'") {
           this.ans.push(this.makeLexer('string', this.elems.join('')));
-          this.ans.push(this.makeLexer('symbol', "'"));
+          this.ans.push(this.makeLexer('quotation', "'"));
           return this.quit();
         } else {
           this.elems.push(char);
@@ -263,7 +263,7 @@ class JavascriptLexer extends Lexer {
       case 8: {
         if (char === 't') {
           this.elems.push(char);
-          this.ans.push(this.makeLexer('reserve', this.elems.join('')));
+          this.ans.push(this.makeLexer('declare', this.elems.join('')));
           this.quit();
         } else if (char === 'EOF') {
           this.ans.push(this.makeLexer('identifer', this.elems.join('')));
@@ -320,7 +320,7 @@ class JavascriptLexer extends Lexer {
       case 12: {
         if (char === 'k') {
           this.elems.push(char);
-          this.ans.push(this.makeLexer('reserve', this.elems.join('')));
+          this.ans.push(this.makeLexer('for', this.elems.join('')));
           this.quit();
         } else if (char === 'EOF') {
           this.ans.push(this.makeLexer('identifer', this.elems.join('')));
@@ -372,7 +372,7 @@ class JavascriptLexer extends Lexer {
       case 15: {
         if (char === 'e') {
           this.elems.push(char);
-          this.ans.push(this.makeLexer('reserve', this.elems.join('')));
+          this.ans.push(this.makeLexer('switch', this.elems.join('')));
           this.quit();
         } else if (char === 'EOF') {
           this.ans.push(this.makeLexer('identifer', this.elems.join('')));
@@ -401,7 +401,7 @@ class JavascriptLexer extends Lexer {
       case 17: {
         if (char === 'h') {
           this.elems.push(char);
-          this.ans.push(this.makeLexer('reserve', this.elems.join('')));
+          this.ans.push(this.makeLexer('try', this.elems.join('')));
           this.quit();
         } else if (char === 'EOF') {
           this.ans.push(this.makeLexer('identifer', this.elems.join('')));
@@ -444,7 +444,7 @@ class JavascriptLexer extends Lexer {
       case 20: {
         if (char === 's') {
           this.elems.push(char);
-          this.ans.push(this.makeLexer('reserve', this.elems.join('')));
+          this.ans.push(this.makeLexer('declare', this.elems.join('')));
           this.quit();
         } else if (char === 'EOF') {
           this.ans.push(this.makeLexer('identifer', this.elems.join('')));
@@ -532,7 +532,7 @@ class JavascriptLexer extends Lexer {
       case 26: {
         if (char === 'e') {
           this.elems.push(char);
-          this.ans.push(this.makeLexer('reserve', this.elems.join('')));
+          this.ans.push(this.makeLexer('for', this.elems.join('')));
           this.quit();
         } else if (char === 'EOF') {
           this.ans.push(this.makeLexer('identifer', this.elems.join('')));

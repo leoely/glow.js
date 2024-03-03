@@ -3,4 +3,4 @@ import JavascriptLexer from '~/class/JavascriptLexer';
 
 const highLight = new HighLight();
 highLight.addLexer(JavascriptLexer);
-console.log(highLight.parse('debugger'));
+console.log(highLight.parse('while'));

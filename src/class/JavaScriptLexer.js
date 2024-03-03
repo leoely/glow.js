@@ -11,6 +11,57 @@ class JavascriptLexer extends Lexer {
     return this.ans[length - 1].type === type;
   }
 
+  readReserveLetter(char, letter, status) {
+    if (char === letter) {
+      this.elems.push(char);
+      this.status = status;
+    } else if (char === 'EOF') {
+      this.ans.push(this.makeLexer('identifer', this.elems.join('')));
+      this.quit();
+    } else {
+      this.identifer = true;
+      this.status = 1;
+    }
+  }
+
+  readReserveLetters(char, list) {
+    let flag = false;
+    for (let i = 0; i < list.length; i += 1) {
+      const [letter, status] = list[i];
+      if (char === letter) {
+        this.elems.push(char);
+        this.status = status;
+        flag = true;
+        break;
+      }
+    }
+    if (flag === false) {
+      if (char === 'EOF') {
+        this.ans.push(this.makeLexer('identifer', this.elems.join('')));
+        this.quit();
+      } else {
+        this.identifer = true;
+        this.elems.push(char);
+        this.status = 1;
+      }
+    }
+  }
+
+  getReserve(char, letter, set) {
+    if (char === letter) {
+      this.elems.push(char);
+      this.ans.push(this.makeLexer(set, this.elems.join('')));
+      this.quit();
+    } else if (char === 'EOF') {
+      this.ans.push(this.makeLexer('identifer', this.elems.join('')));
+      this.quit();
+    } else {
+      this.identifer = true;
+      this.elems.push(char);
+      this.status = 1;
+    }
+  }
+
   scan(char) {
     switch (this.status) {
       case 0: {
@@ -99,8 +150,8 @@ class JavascriptLexer extends Lexer {
             case 'd':
               this.elems = [];
               this.elems.push(char);
-              this.status = 8;
-              break;
+              this.status = 28;
+              return;
             case 'e':
               this.elems = [];
               this.elems.push(char);
@@ -219,306 +270,115 @@ class JavascriptLexer extends Lexer {
         break;
       }
       case 5: {
-        if (char === 'w') {
-          this.elems.push(char);
-          this.status = 6;
-        } else if (char === 'EOF') {
-          this.ans.push(this.makeLexer('identifer', this.elems.join('')));
-          this.quit();
-        } else {
-          this.identifer = true;
-          this.setIndex(this.i - 1);
-          this.status = 1;
-        }
+        this.readReserveLetter(char, 'w', 6);
         break;
       }
       case 6: {
-        if (char === 'a') {
-          this.elems.push(char);
-          this.status = 7;
-        } else if (char === 'EOF') {
-          this.ans.push(this.makeLexer('identifer', this.elems.join('')));
-          this.quit();
-        } else {
-          this.identifer = true;
-          this.setIndex(this.i - 1);
-          this.status = 1;
-        }
+        this.readReserveLetter(char, 'a', 7);
         break;
       }
       case 7: {
-        if (char === 'i') {
-          this.elems.push(char);
-          this.status = 8;
-        } else if (char === 'EOF') {
-          this.ans.push(this.makeLexer('identifer', this.elems.join('')));
-          this.quit();
-        } else {
-          this.identifer = true;
-          this.elems.push(char);
-          this.status = 1;
-        }
+        this.readReserveLetter(char, 'i', 8);
         break;
       }
       case 8: {
-        if (char === 't') {
-          this.elems.push(char);
-          this.ans.push(this.makeLexer('declare', this.elems.join('')));
-          this.quit();
-        } else if (char === 'EOF') {
-          this.ans.push(this.makeLexer('identifer', this.elems.join('')));
-          this.quit();
-        } else {
-          this.identifer = true;
-          this.elems.push(char);
-          this.status = 1;
-        }
+        this.getReserve(char, 't', 'async');
         break;
       }
       case 9: {
-        if (char === 'r') {
-          this.elems.push(char);
-          this.status = 10;
-        } else if (char === 'EOF') {
-          this.ans.push(this.makeLexer('identifer', this.elems.join('')));
-          this.quit();
-        } else {
-          this.identifer = true;
-          this.elems.push(char);
-          this.status = 1;
-        }
+        this.readReserveLetter(char, 'r', 10);
         break;
       }
       case 10: {
-        if (char === 'e') {
-          this.elems.push(char);
-          this.status = 11;
-        } else if (char === 'EOF') {
-          this.ans.push(this.makeLexer('identifer', this.elems.join('')));
-          this.quit();
-        } else {
-          this.identifer = true;
-          this.elems.push(char);
-          this.status = 1;
-        }
+        this.readReserveLetter(char, 'e', 11);
         break;
       }
       case 11: {
-        if (char === 'a') {
-          this.elems.push(char);
-          this.status = 12;
-        } else if (char === 'EOF') {
-          this.ans.push(this.makeLexer('identifer', this.elems.join('')));
-          this.quit();
-        } else {
-          this.identifer = true;
-          this.elems.push(char);
-          this.status = 1;
-        }
+        this.readReserveLetter(char, 'a', 12);
         break;
       }
       case 12: {
-        if (char === 'k') {
-          this.elems.push(char);
-          this.ans.push(this.makeLexer('for', this.elems.join('')));
-          this.quit();
-        } else if (char === 'EOF') {
-          this.ans.push(this.makeLexer('identifer', this.elems.join('')));
-          this.quit();
-        } else {
-          this.identifer = true;
-          this.elems.push(char);
-          this.status = 1;
-        }
+        this.getReserve(char, 'k', 'for');
         break;
       }
       case 13: {
-        if (char === 'a') {
-          this.elems.push(char);
-          this.status = 14;
-        } else if (char === 'l') {
-          this.elems.push(char);
-          this.status = 18;
-        } else if (char === 'o') {
-          this.elems.push(char);
-          this.status = 21;
-        } else if (char === 'EOF') {
-          this.ans.push(this.makeLexer('identifer', this.elems.join('')));
-          this.quit();
-        } else {
-          this.identifer = true;
-          this.elems.push(char);
-          this.status = 1;
-        }
+        this.readReserveLetters(char, [
+          ['a', 14],
+          ['l', 18],
+          ['o', 21],
+        ]);
         break;
       }
       case 14: {
-        if (char === 's') {
-          this.elems.push(char);
-          this.status = 15;
-        } else if (char === 't') {
-          this.elems.push(char);
-          this.status = 16;
-        } else if (char === 'EOF') {
-          this.ans.push(this.makeLexer('identifer', this.elems.join('')));
-          this.quit();
-        } else {
-          this.identifer = true;
-          this.elems.push(char);
-          this.status = 1;
-        }
+        this.readReserveLetters(char, [
+          ['s', 15],
+          ['t', 16],
+        ]);
         break;
       }
       case 15: {
-        if (char === 'e') {
-          this.elems.push(char);
-          this.ans.push(this.makeLexer('switch', this.elems.join('')));
-          this.quit();
-        } else if (char === 'EOF') {
-          this.ans.push(this.makeLexer('identifer', this.elems.join('')));
-          this.quit();
-        } else {
-          this.identifer = true;
-          this.elems.push(char);
-          this.status = 1;
-        }
+        this.getReserve(char, 'e', 'switch');
         break;
       }
       case 16: {
-        if (char === 'c') {
-          this.elems.push(char);
-          this.status = 17;
-        } else if (char === 'EOF') {
-          this.ans.push(this.makeLexer('identifer', this.elems.join('')));
-          this.quit();
-        } else {
-          this.identifer = true;
-          this.elems.push(char);
-          this.status = 1;
-        }
+        this.readReserveLetter(char, 'c', 17);
         break;
       }
       case 17: {
-        if (char === 'h') {
-          this.elems.push(char);
-          this.ans.push(this.makeLexer('try', this.elems.join('')));
-          this.quit();
-        } else if (char === 'EOF') {
-          this.ans.push(this.makeLexer('identifer', this.elems.join('')));
-          this.quit();
-        } else {
-          this.identifer = true;
-          this.elems.push(char);
-          this.status = 1;
-        }
+        this.getReserve(char, 'h', 'try');
         break;
       }
       case 18: {
-        if (char === 'a') {
-          this.elems.push(char);
-          this.status = 19;
-        } else if (char === 'EOF') {
-          this.ans.push(this.makeLexer('identifer', this.elems.join('')));
-          this.quit();
-        } else {
-          this.identifer = true;
-          this.elems.push(char);
-          this.status = 1;
-        }
+        this.readReserveLetter(char, 'a', 19);
         break;
       }
       case 19: {
-        if (char === 's') {
-          this.elems.push(char);
-          this.status = 20;
-        } else if (char === 'EOF') {
-          this.ans.push(this.makeLexer('identifer', this.elems.join('')));
-          this.quit();
-        } else {
-          this.identifer = true;
-          this.elems.push(char);
-          this.status = 1;
-        }
+        this.readReserveLetter(char, 's', 20);
         break;
       }
       case 20: {
-        if (char === 's') {
-          this.elems.push(char);
-          this.ans.push(this.makeLexer('declare', this.elems.join('')));
-          this.quit();
-        } else if (char === 'EOF') {
-          this.ans.push(this.makeLexer('identifer', this.elems.join('')));
-          this.quit();
-        } else {
-          this.identifer = true;
-          this.elems.push(char);
-          this.status = 1;
-        }
+        this.getReserve(char, 's', 'declare');
         break;
       }
       case 21: {
-        if (char === 'n') {
-          this.elems.push(char);
-          this.status = 22;
-        } else if (char === 'EOF') {
-          this.ans.push(this.makeLexer('identifer', this.elems.join('')));
-          this.quit();
-        } else {
-          this.identifer = true;
-          this.elems.push(char);
-          this.status = 1;
-        }
+        this.readReserveLetter(char, 'n', 22);
         break;
       }
       case 22: {
-        if (char === 's') {
-          this.elems.push(char);
-          this.status = 1000;
-        } else if (char === 't') {
-          this.elems.push(char);
-          this.status = 23;
-        } else if (char === 'EOF') {
-          this.ans.push(this.makeLexer('identifer', this.elems.join('')));
-          this.quit();
-        } else {
-          this.identifer = true;
-          this.elems.push(char);
-          this.status = 1;
-        }
+        this.readReserveLetters(char, [
+          ['s', 27],
+          ['t', 23],
+        ]);
         break;
       }
       case 23: {
-        if (char === 'i') {
-          this.elems.push(char);
-          this.status = 24;
-        } else if (char === 'EOF') {
-          this.ans.push(this.makeLexer('identifer', this.elems.join('')));
-          this.quit();
-        } else {
-          this.identifer = true;
-          this.elems.push(char);
-          this.status = 1;
-        }
+        this.readReserveLetter(char, 'i', 24);
         break;
       }
       case 24: {
-        if (char === 'n') {
-          this.elems.push(char);
-          this.status = 25;
-        } else if (char === 'EOF') {
-          this.ans.push(this.makeLexer('identifer', this.elems.join('')));
-          this.quit();
-        } else {
-          this.identifer = true;
-          this.elems.push(char);
-          this.status = 1;
-        }
+        this.readReserveLetter(char, 'n', 25);
         break;
       }
       case 25: {
-        if (char === 'u') {
+        this.readReserveLetter(char, 'u', 26);
+        break;
+      }
+      case 26: {
+        this.getReserve(char, 'e', 'for');
+        break;
+      }
+      case 27: {
+        this.getReserve(char, 't', 'declare');
+        break;
+      }
+      case 28: {
+        if (char === 'e') {
           this.elems.push(char);
-          this.status = 26;
+          this.status = 29;
+        } else if (char === 'o') {
+          this.elems.push(char);
+          this.ans.push(this.makeLexer('while', this.elems.join('')));
+          this.quit();
         } else if (char === 'EOF') {
           this.ans.push(this.makeLexer('identifer', this.elems.join('')));
           this.quit();
@@ -529,19 +389,48 @@ class JavascriptLexer extends Lexer {
         }
         break;
       }
-      case 26: {
-        if (char === 'e') {
-          this.elems.push(char);
-          this.ans.push(this.makeLexer('for', this.elems.join('')));
-          this.quit();
-        } else if (char === 'EOF') {
-          this.ans.push(this.makeLexer('identifer', this.elems.join('')));
-          this.quit();
-        } else {
-          this.identifer = true;
-          this.elems.push(char);
-          this.status = 1;
-        }
+      case 29: {
+        this.readReserveLetters(char, [
+          ['b', 30],
+          ['f', 35],
+          ['l', 1000]
+        ]);
+        break;
+      }
+      case 30: {
+        this.readReserveLetter(char, 'u', 31);
+        break;
+      }
+      case 31: {
+        this.readReserveLetter(char, 'g', 32);
+        break;
+      }
+      case 32: {
+        this.readReserveLetter(char, 'g', 33);
+        break;
+      }
+      case 33: {
+        this.readReserveLetter(char, 'e', 34);
+        break;
+      }
+      case 34: {
+        this.getReserve(char, 'r', 'debugger');
+        break;
+      }
+      case 35: {
+        this.readReserveLetter(char, 'a', 36);
+        break;
+      }
+      case 36: {
+        this.readReserveLetter(char, 'u', 37);
+        break;
+      }
+      case 37: {
+        this.readReserveLetter(char, 'l', 38);
+        break;
+      }
+      case 38: {
+        this.getReserve(char, 't', 'switch');
         break;
       }
       default:

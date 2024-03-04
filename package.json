@@ -1,7 +1,7 @@
 {
   "name": "glow.js",
   "version": "0.0.2",
-  "description": "Highlight project.",
+  "description": "Frontend highlight project.",
   "main": "dist/index.js",
   "repository": {
     "type": "git",

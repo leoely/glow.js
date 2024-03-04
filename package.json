@@ -1,9 +1,12 @@
 {
-  "name": "highlight",
+  "name": "glow",
   "version": "0.0.1",
   "description": "Highlight project.",
   "main": "dist/index.js",
-  "repository": "git@github.com:leoely/highlight.git",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/leoely/highlight.git"
+  },
   "author": "Leo Ely",
   "license": "MIT",
   "scripts": {

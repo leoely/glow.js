@@ -13,19 +13,18 @@ class ShellLexer extends Lexer {
             this.elems = [];
             this.elems.push(char);
             this.status = 1;
-            break;
+            return;
           case 'c':
             this.elems = [];
             this.elems.push(char);
             this.status = 2;
-            break;
+            return;
           case '-':
             this.ans.push(this.makeLexer('symbol', '-'));
             return this.quit();
-            break;
           case '|':
             this.status = 4;
-            break;
+            return;
           case '#':
             this.elems = [];
             this.elems.push(char);
@@ -33,7 +32,6 @@ class ShellLexer extends Lexer {
             return;
           default:
             return this.quit();
-            break;
         }
         break;
       case 1:
@@ -115,7 +113,7 @@ class ShellLexer extends Lexer {
         break;
       }
       case 6: {
-        if (char === '\n') {
+        if (char === '\n' || char === 'EOF') {
           this.ans.push(this.makeLexer('hashbangComment', this.elems.join('')));
           return this.quit();
         } else {

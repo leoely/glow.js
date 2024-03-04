@@ -11,4 +11,4 @@ babel.config.json
 .eslintrc
 .eslintignore
 .editorconfig
-.yarn.lock
+yarn.lock

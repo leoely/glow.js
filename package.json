@@ -1,5 +1,5 @@
 {
-  "name": "glow",
+  "name": "glow.js",
   "version": "0.0.1",
   "description": "Highlight project.",
   "main": "dist/index.js",

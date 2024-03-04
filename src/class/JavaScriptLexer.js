@@ -66,11 +66,52 @@ class JavascriptLexer extends Lexer {
     switch (this.status) {
       case 0: {
         switch (char) {
-          case '.':
-            this.ans.push(this.makeLexer('symbol', '.'));
-            return this.quit();
+          case '/':
+            this.elems = [];
+            this.elems.push(char);
+            this.status = 121;
+            return;
           case '*':
             this.ans.push(this.makeLexer('symbol', '*'));
+            return this.quit();
+          case '<':
+            this.ans.push(this.makeLexer('angleBrackets', '<'));
+            return this.quit();
+          case '>':
+            this.ans.push(this.makeLexer('angleBrackets', '>'));
+            return this.quit();
+          case '.':
+            this.ans.push(this.makeLexer('call', '.'));
+            return this.quit();
+          case '+':
+            this.ans.push(this.makeLexer('arithmetic', '+'));
+            return this.quit();
+          case '-':
+            this.ans.push(this.makeLexer('arithmetic', '-'));
+            return this.quit();
+          case '^':
+            this.ans.push(this.makeLexer('arithmetic', '^'));
+            return this.quit();
+          case '%':
+            this.ans.push(this.makeLexer('arithmetic', '%'));
+            return this.quit();
+          case '|':
+            this.ans.push(this.makeLexer('logic', '|'));
+            return this.quit();
+          case '&':
+            this.ans.push(this.makeLexer('logic', '&'));
+            return this.quit();
+          case '!':
+            this.ans.push(this.makeLexer('logic', '!'));
+            return this.quit();
+          case '~':
+            this.ans.push(this.makeLexer('logic', '~'));
+            return this.quit();
+          case '?':
+            this.ans.push(this.makeLexer('logic', '?'));
+            return this.quit();
+          case '=':
+            this.ans.push(this.makeLexer('arithmetic', '='));
             return this.quit();
           case '(':
             this.ans.push(this.makeLexer('parenthese', '('));
@@ -126,6 +167,14 @@ class JavascriptLexer extends Lexer {
               this.elems = [];
               this.ans.push(this.makeLexer('quotation', "'"));
               this.status = 4;
+              break;
+            }
+          }
+          case '`': {
+            if (!this.checkLexerDuplicate('`')) {
+              this.elems = [];
+              this.ans.push(this.makeLexer('quotation', '`'));
+              this.status = 125;
               break;
             }
           }
@@ -212,6 +261,15 @@ class JavascriptLexer extends Lexer {
           }
         }
         const code = char.charCodeAt(0);
+        if (
+          (code >= 48 && code <= 57) || (code >= 65 && code <= 70) ||
+          (code >= 97 && code <= 102) || char === '_' || char === '-'
+        ) {
+          this.elems = [];
+          this.elems.push(char);
+          this.status = 126;
+          return;
+        }
         if (
           (code >= 97 && code <= 122) ||
           (code >= 65 && code <= 90) || (code === 95)
@@ -832,6 +890,75 @@ class JavascriptLexer extends Lexer {
       }
       case 120: {
         this.getReserve(char, 'h', 'function');
+        break;
+      }
+      case 121: {
+        this.elems.push(char);
+        if (char === '/') {
+          this.status = 122;
+        } else if (char === '*') {
+          this.status = 123;
+        } else {
+          this.ans.push(this.makeLexer('arithmetic', '/'));
+          this.quit();
+        }
+        break;
+      }
+      case 122: {
+        this.elems.push(char);
+        if (char === '\n') {
+          this.ans.push(this.makeLexer('lineComment', this.elems.join('')));
+          return this.quit();
+        }
+        break;
+      }
+      case 123: {
+        this.elems.push(char);
+        if (char === '*') {
+          this.status = 124;
+        } else {
+          return this.quit();
+        }
+        break;
+      }
+      case 124: {
+        if (char === '/') {
+          this.elems.push(char);
+          this.ans.push(this.makeLexer('blockComment', this.elems.join('')));
+        } else {
+          return this.quit();
+        }
+        break;
+      }
+      case 125: {
+        if (char === '`') {
+          this.ans.push(this.makeLexer('string', this.elems.join('')));
+          this.ans.push(this.makeLexer('quotation', "'"));
+          return this.quit();
+        } else {
+          this.elems.push(char);
+        }
+        break;
+      }
+      case 126: {
+        const code = char.charCodeAt(0);
+        if (char === 'EOF') {
+          this.ans.push(this.makeLexer('decimal', this.elems.join('')));
+          return this.quit();
+        } else if (
+          (code >= 48 && code <= 57) || (code >= 65 && code <= 70) ||
+          (code >= 97 && code <= 102) || char === '_' || char === '.' ||
+          char === '-'
+        ) {
+          this.elems.push(char);
+        } else if (char === 'n') {
+          this.elems.push(char);
+          this.ans.push(this.makeLexer('decimal', this.elems.join('')));
+          return this.quit();
+        } else {
+          this.ans.push(this.makeLexer('decimal', this.elems.join('')));
+          return this.quit();
+        }
         break;
       }
       default:

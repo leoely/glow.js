@@ -26,6 +26,11 @@ class ShellLexer extends Lexer {
           case '|':
             this.status = 4;
             break;
+          case '#':
+            this.elems = [];
+            this.elems.push(char);
+            this.status = 5;
+            return;
           default:
             return this.quit();
             break;
@@ -100,6 +105,24 @@ class ShellLexer extends Lexer {
             return this.quit();
         }
         break;
+      case 5: {
+        if (char === '!') {
+          this.elems.push(char);
+          this.status = 6;
+        } else {
+          return this.quit();
+        }
+        break;
+      }
+      case 6: {
+        if (char === '\n') {
+          this.ans.push(this.makeLexer('hashbangComment', this.elems.join('')));
+          return this.quit();
+        } else {
+          this.elems.push(char);
+        }
+        break;
+      }
       default:
         return this.quit();
     }

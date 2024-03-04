@@ -260,6 +260,18 @@ class JavascriptLexer extends Lexer {
               this.identifer = false;
           }
         }
+        if (char === '0') {
+          this.elems = [];
+          this.elems.push(char);
+          this.status = 127;
+          return;
+        }
+        if (char === 'o' || char === 'O') {
+          this.elems = [];
+          this.elems.push(char);
+          this.status = 126;
+          return;
+        }
         const code = char.charCodeAt(0);
         if (
           (code >= 48 && code <= 57) || (code >= 65 && code <= 70) ||
@@ -957,6 +969,15 @@ class JavascriptLexer extends Lexer {
           return this.quit();
         } else {
           this.ans.push(this.makeLexer('decimal', this.elems.join('')));
+          return this.quit();
+        }
+        break;
+      }
+      case 127: {
+        if (char === 'x' || char === 'X') {
+          this.elems.push(char);
+          this.status = 126;
+        } else {
           return this.quit();
         }
         break;

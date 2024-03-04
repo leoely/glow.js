@@ -1,2 +1,2 @@
-# highlight
+# Glow
 Frontend highlight project.

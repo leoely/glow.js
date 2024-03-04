@@ -193,19 +193,19 @@ class JavascriptLexer extends Lexer {
             break;
           case ';':
             if (!this.checkLexerDuplicate(';')) {
-              this.ans.push(this.makeLexer('symbol', ';'));
+              this.ans.push(this.makeLexer('function', ';'));
               return this.quit();
             }
             break;
           case ':':
             if (!this.checkLexerDuplicate(':')) {
-              this.ans.push(this.makeLexer('symbol', ':'));
+              this.ans.push(this.makeLexer('iteral', ':'));
               return this.quit();
             }
             break;
           case ',':
             if (!this.checkLexerDuplicate(',')) {
-              this.ans.push(this.makeLexer('symbol', ','));
+              this.ans.push(this.makeLexer('iteral', ','));
               return this.quit();
             }
             break;

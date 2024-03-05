@@ -322,6 +322,17 @@ class JavascriptLexer extends Lexer {
           return;
         }
         const code = char.charCodeAt(0);
+        if (char === 'o' || char === 'O') {
+          this.elems = [];
+          this.elems.push(char);
+          this.status = 129;
+          return;
+        }
+        if (code >= 48 && code <= 57) {
+          this.elems = [];
+          this.elems.push(char);
+          this.status = 130;
+        }
         if (
           (code >= 97 && code <= 122) ||
           (code >= 65 && code <= 90) || (code === 95)
@@ -329,12 +340,6 @@ class JavascriptLexer extends Lexer {
           this.elems = [];
           this.elems.push(char);
           this.status = 1;
-          return;
-        }
-        if (char === 'o' || char === 'O') {
-          this.elems = [];
-          this.elems.push(char);
-          this.status = 126;
           return;
         }
         break;
@@ -970,9 +975,8 @@ class JavascriptLexer extends Lexer {
           this.ans.push(this.makeLexer('decimal', this.elems.join('')));
           return this.quit();
         } else if (
-          (code >= 48 && code <= 57) || (code >= 65 && code <= 70) ||
-          (code >= 97 && code <= 102) || char === '_' || char === '.' ||
-          char === '-'
+          (code >= 48 && code <= 57) ||
+          char === '_' || char === '.' || char === 'e' || char === 'E'
         ) {
           this.elems.push(char);
         } else if (char === 'n') {
@@ -986,10 +990,71 @@ class JavascriptLexer extends Lexer {
         break;
       }
       case 127: {
+        this.elems.push(char);
         if (char === 'x' || char === 'X') {
-          this.elems.push(char);
-          this.status = 126;
+          this.status = 128;
         } else {
+          this.status = 130;
+        }
+        break;
+      }
+      case 128: {
+        const code = char.charCodeAt(0);
+        if (char === 'EOF') {
+          this.ans.push(this.makeLexer('decimal', this.elems.join('')));
+          return this.quit();
+        } else if (
+          (code >= 48 && code <= 57) || (code >= 65 && code <= 70) ||
+          (code >= 97 && code <= 102) || char === '_' || char === '.' ||
+          char === '-' || char === 'e' || char === 'E'
+        ) {
+          this.elems.push(char);
+        } else if (char === 'n') {
+          this.elems.push(char);
+          this.ans.push(this.makeLexer('decimal', this.elems.join('')));
+          return this.quit();
+        } else {
+          this.ans.push(this.makeLexer('decimal', this.elems.join('')));
+          return this.quit();
+        }
+        break;
+      }
+      case 129: {
+        const code = char.charCodeAt(0);
+        if (char === 'EOF') {
+          this.ans.push(this.makeLexer('decimal', this.elems.join('')));
+          return this.quit();
+        } else if (
+          (code >= 48 && code <= 55) ||
+          char === '_' || char === '.' || char === 'e' || char === 'E'
+        ) {
+          this.elems.push(char);
+        } else if (char === 'n') {
+          this.elems.push(char);
+          this.ans.push(this.makeLexer('decimal', this.elems.join('')));
+          return this.quit();
+        } else {
+          this.ans.push(this.makeLexer('decimal', this.elems.join('')));
+          return this.quit();
+        }
+        break;
+      }
+      case 130: {
+        const code = char.charCodeAt(0);
+        if (char === 'EOF') {
+          this.ans.push(this.makeLexer('decimal', this.elems.join('')));
+          return this.quit();
+        } else if (
+          (code >= 48 && code <= 57) || char === '_' || char === '.' ||
+          char === 'e' || char === 'E'
+        ) {
+          this.elems.push(char);
+        } else if (char === 'n') {
+          this.elems.push(char);
+          this.ans.push(this.makeLexer('decimal', this.elems.join('')));
+          return this.quit();
+        } else {
+          this.ans.push(this.makeLexer('decimal', this.elems.join('')));
           return this.quit();
         }
         break;

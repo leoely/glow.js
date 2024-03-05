@@ -45,7 +45,7 @@ class HighLight {
           }
         }
       });
-      if ((char === ' ' || char === '\n') && this.use === 0) {
+      if ((char === ' ' || char === '\n')) {
         ans.push({ type: char, });
       }
       for (let j = 0; j < times.length; j += 1) {

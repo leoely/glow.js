@@ -1034,8 +1034,8 @@ class JavascriptLexer extends Lexer {
           this.ans.push(this.makeLexer('decimal', this.elems.join('')));
           return this.quit();
         } else {
-          this.ans.push(this.makeLexer('decimal', this.elems.join('')));
-          return this.quit();
+          this.elems.push(char);
+          this.status = 1;
         }
         break;
       }

@@ -47,6 +47,7 @@ class HighLight {
       });
       if ((char === ' ' || char === '\n')) {
         ans.push({ type: char, });
+        continue;
       }
       for (let j = 0; j < times.length; j += 1) {
         if (times.every(t => t <= 0)) {

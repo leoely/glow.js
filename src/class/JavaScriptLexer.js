@@ -17,7 +17,7 @@ class JavascriptLexer extends Lexer {
       this.status = status;
     } else if (char === 'EOF') {
       this.ans.push(this.makeLexer('identifer', this.elems.join('')));
-      this.quit();
+      return this.quit();
     } else {
       this.identifer = true;
       this.elems.push(char);
@@ -39,7 +39,7 @@ class JavascriptLexer extends Lexer {
     if (flag === false) {
       if (char === 'EOF') {
         this.ans.push(this.makeLexer('identifer', this.elems.join('')));
-        this.quit();
+        return this.quit();
       } else {
         this.identifer = true;
         this.elems.push(char);
@@ -52,10 +52,7 @@ class JavascriptLexer extends Lexer {
     if (char === letter) {
       this.elems.push(char);
       this.ans.push(this.makeLexer(set, this.elems.join('')));
-      return this.quit();
-    } else if (char === 'EOF') {
-      this.ans.push(this.makeLexer('identifer', this.elems.join('')));
-      return this.quit();
+      return;
     } else {
       this.identifer = true;
       this.elems.push(char);
@@ -311,8 +308,13 @@ class JavascriptLexer extends Lexer {
               this.elems.push(char);
               this.status = 111;
               return;
+            case 'z':
+              this.elems = [];
+              this.elems.push(char);
+              this.status = 131;
+              return;
             default:
-              this.identifer = false;
+              this.identifer = true;
           }
         }
         if (char === '0') {
@@ -321,17 +323,18 @@ class JavascriptLexer extends Lexer {
           this.status = 127;
           return;
         }
-        const code = char.charCodeAt(0);
         if (char === 'o' || char === 'O') {
           this.elems = [];
           this.elems.push(char);
           this.status = 129;
           return;
         }
+        const code = char.charCodeAt(0);
         if (code >= 48 && code <= 57) {
           this.elems = [];
           this.elems.push(char);
           this.status = 130;
+          return;
         }
         if (
           (code >= 97 && code <= 122) ||
@@ -396,93 +399,77 @@ class JavascriptLexer extends Lexer {
         break;
       }
       case 5: {
-        this.readReserveLetter(char, 'w', 6);
-        break;
+        return this.readReserveLetter(char, 'w', 6);
       }
       case 6: {
-        this.readReserveLetter(char, 'a', 7);
-        break;
+        return this.readReserveLetter(char, 'a', 7);
       }
       case 7: {
-        this.readReserveLetter(char, 'i', 8);
-        break;
+        return this.readReserveLetter(char, 'i', 8);
       }
       case 8: {
         return this.getReserve(char, 't', 'async');
       }
       case 9: {
-        this.readReserveLetter(char, 'r', 10);
-        break;
+        return this.readReserveLetter(char, 'r', 10);
       }
       case 10: {
-        this.readReserveLetter(char, 'e', 11);
-        break;
+        return this.readReserveLetter(char, 'e', 11);
       }
       case 11: {
-        this.readReserveLetter(char, 'a', 12);
-        break;
+        return this.readReserveLetter(char, 'a', 12);
       }
       case 12: {
         return  this.getReserve(char, 'k', 'for');
       }
       case 13: {
-        this.readReserveLetters(char, [
+        return this.readReserveLetters(char, [
           ['a', 14],
           ['l', 18],
           ['o', 21],
         ]);
-        break;
       }
       case 14: {
-        this.readReserveLetters(char, [
+        return this.readReserveLetters(char, [
           ['s', 15],
           ['t', 16],
         ]);
-        break;
       }
       case 15: {
         return this.getReserve(char, 'e', 'switch');
       }
       case 16: {
-        this.readReserveLetter(char, 'c', 17);
-        break;
+        return this.readReserveLetter(char, 'c', 17);
       }
       case 17: {
         return this.getReserve(char, 'h', 'try');
       }
       case 18: {
-        this.readReserveLetter(char, 'a', 19);
-        break;
+        return this.readReserveLetter(char, 'a', 19);
       }
       case 19: {
-        this.readReserveLetter(char, 's', 20);
-        break;
+        return this.readReserveLetter(char, 's', 20);
       }
       case 20: {
         return this.getReserve(char, 's', 'class');
       }
       case 21: {
-        this.readReserveLetter(char, 'n', 22);
-        break;
+        return this.readReserveLetter(char, 'n', 22);
       }
       case 22: {
-        this.readReserveLetters(char, [
+        return this.readReserveLetters(char, [
           ['s', 27],
           ['t', 23],
         ]);
-        break;
       }
       case 23: {
-        this.readReserveLetter(char, 'i', 24);
-        break;
+        return this.readReserveLetter(char, 'i', 24);
       }
       case 24: {
-        this.readReserveLetter(char, 'n', 25);
-        break;
+        return this.readReserveLetter(char, 'n', 25);
       }
       case 25: {
-        this.readReserveLetter(char, 'u', 26);
-        break;
+        return this.readReserveLetter(char, 'u', 26);
       }
       case 26: {
         return this.getReserve(char, 'e', 'for');
@@ -609,12 +596,11 @@ class JavascriptLexer extends Lexer {
         return this.getReserve(char, 's', 'class');
       }
       case 53: {
-        this.readReserveLetters(char, [
+        return this.readReserveLetters(char, [
           ['a', 54],
           ['o', 57],
           ['u', 58],
         ]);
-        break;
       }
       case 54: {
         this.readReserveLetter(char, 'l', 55);
@@ -631,24 +617,19 @@ class JavascriptLexer extends Lexer {
         return this.getReserve(char, 'r', 'for');
       }
       case 58: {
-        this.readReserveLetter(char, 'n', 59);
-        break;
+        return this.readReserveLetter(char, 'n', 59);
       }
       case 59: {
-        this.readReserveLetter(char, 'c', 60);
-        break;
+        return this.readReserveLetter(char, 'c', 60);
       }
       case 60: {
-        this.readReserveLetter(char, 't', 61);
-        break;
+        return this.readReserveLetter(char, 't', 61);
       }
       case 61: {
-        this.readReserveLetter(char, 'i', 62);
-        break;
+        return this.readReserveLetter(char, 'i', 62);
       }
       case 62: {
-        this.readReserveLetter(char, 'o', 63);
-        break;
+        return this.readReserveLetter(char, 'o', 63);
       }
       case 63: {
         return this.getReserve(char, 'n', 'declare');
@@ -663,10 +644,10 @@ class JavascriptLexer extends Lexer {
         } else if (char === 'f') {
           this.elems.push(char);
           this.ans.push(this.makeLexer('if', this.elems.join('')));
-          this.quit();
+          return this.quit();
         } else if (char === 'EOF') {
           this.ans.push(this.makeLexer('identifer', this.elems.join('')));
-          this.quit();
+          return this.quit();
         } else {
           this.identifer = true;
           this.elems.push(char);
@@ -695,7 +676,7 @@ class JavascriptLexer extends Lexer {
           this.readReserveLetter(char, 's', 70);
         } else {
           this.ans.push(this.makeLexer('in', 'in'));
-          this.quit();
+          return this.quit();
         }
         break;
       }
@@ -850,10 +831,10 @@ class JavascriptLexer extends Lexer {
         } else if (char === 'y') {
           this.elems.push(char);
           this.ans.push(this.makeLexer('try', this.elems.join('')));
-          this.quit();
+          return this.quit();
         } else if (char === 'EOF') {
           this.ans.push(this.makeLexer('identifer', this.elems.join('')));
-          this.quit();
+          return this.quit();
         } else {
           this.identifer = true;
           this.elems.push(char);
@@ -929,7 +910,7 @@ class JavascriptLexer extends Lexer {
           this.status = 123;
         } else {
           this.ans.push(this.makeLexer('arithmetic', '/'));
-          this.quit();
+          return this.quit();
         }
         break;
       }

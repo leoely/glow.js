@@ -67,11 +67,7 @@ class CtfLexer extends Lexer {
           this.ans.push(this.makeLexer('formate', this.elems.join('')));
           return this.quit();
         }
-        if (char === '(' || char === '[' || char === '|' || char === 'EOF') {
-          const { length, } = this.elems;
-          if (this.elems[length - 1] === ' ') {
-            this.elems.pop();
-          }
+        if (char === '(' || char === '[' || char === '|' || char === ' ' || char === 'EOF') {
           this.ans.push(this.makeLexer('text', this.elems.join('')));
           return this.quit();
         }

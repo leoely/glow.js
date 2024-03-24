@@ -1,7 +1,7 @@
-export { HighLight, } from '~/class/HighLight';
-export { JavascriptLexer, }from '~/class/JavascriptLexer';
-export { LocationLexer, } from '~/class/LocationLexer';
-export { ShellLexer, } from '~/class/ShellLexer';
-export { VersionLexer, }from '~/class/VersionLexer';
-export { YamlLexer, } from '~/class/VersionLexer';
-export { CtfLexer, } from '~/class/CtfLexer';
+export { default as HighLight, } from '~/class/HighLight';
+export { default as JavascriptLexer, }from '~/class/JavascriptLexer';
+export { default as LocationLexer, } from '~/class/LocationLexer';
+export { default as ShellLexer, } from '~/class/ShellLexer';
+export { default as VersionLexer, }from '~/class/VersionLexer';
+export { default as YamlLexer, } from '~/class/VersionLexer';
+export { default as CtfLexer, } from '~/class/CtfLexer';

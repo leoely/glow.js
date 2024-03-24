@@ -30,9 +30,6 @@ class CtfLexer extends Lexer {
           return;
         }
         switch (char) {
-          case '-':
-            this.ans.push(this.makeLexer('centerLine', '-'));
-            return this.quit();
           case '|':
             this.ans.push(this.makeLexer('dividing', '|'));
             return this.quit();

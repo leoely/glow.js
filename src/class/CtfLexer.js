@@ -60,7 +60,7 @@ class CtfLexer extends Lexer {
         break;
       }
       case 1: {
-        if (char === ',' || char === ':') {
+        if (char === ';' || char === ':') {
           this.ans.push(this.makeLexer('formate', this.elems.join('')));
           return this.quit();
         }

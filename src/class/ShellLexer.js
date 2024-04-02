@@ -9,90 +9,32 @@ class ShellLexer extends Lexer {
     switch (this.status) {
       case 0:
         switch (char) {
-          case 'n':
-            this.elems = [];
-            this.elems.push(char);
-            this.status = 1;
-            return;
-          case 'c':
-            this.elems = [];
-            this.elems.push(char);
-            this.status = 2;
-            return;
           case '-':
-            this.ans.push(this.makeLexer('symbol', '-'));
+            this.ans.push(this.makeLexer('centerLine', '-'));
+            return this.quit();
+          case '.':
+            this.ans.push(this.makeLexer('dot', '.'));
             return this.quit();
           case '|':
-            this.status = 4;
+            this.status = 1;
             return;
           case '#':
             this.elems = [];
             this.elems.push(char);
-            this.status = 5;
+            this.status = 2;
             return;
-          default:
-            return this.quit();
+        }
+        const code = char.charCodeAt(0);
+        if ((code >= 97 && code <= 122) ||
+          (code >= 59 && code <= 64) || (code >= 33 && code <= 42) ||
+          (code >= 47 && code <= 47) || (code >= 123 && code <= 153)) {
+          this.elems = [];
+          this.elems.push(char);
+          this.status = 4;
+          return;
         }
         break;
       case 1:
-        switch (this.elems.length) {
-          case 1:
-            if (char === 'o') {
-              this.elems.push(char);
-            } else {
-              return this.quit();
-            }
-            break;
-          case 2:
-            if (char === 'd') {
-              this.elems.push('d');
-            } else {
-              return this.quit();
-            }
-            break;
-          case 3:
-            if (char === 'e') {
-              this.elems.push(char)
-              this.ans.push(this.makeLexer('command', this.elems.join('')));
-              return this.quit();
-            } else {
-              return this.quit();
-            }
-            break;
-          default:
-            return this.quit();
-        }
-        break;
-      case 2:
-        switch (this.elems.length) {
-          case 1:
-            if (char === 'u') {
-              this.elems.push(char);
-            } else {
-              return this.quit();
-            }
-            break;
-          case 2:
-            if (char === 'r') {
-              this.elems.push('r');
-            } else {
-              return this.quit();
-            }
-            break;
-          case 3:
-            if (char === 'l') {
-              this.elems.push(char);
-              this.ans.push(this.makeLexer('command', this.elems.join('')));
-              return this.quit();
-            } else {
-              return this.quit();
-            }
-            break;
-          default:
-            return this.quit();
-        }
-        break;
-      case 4:
         switch (char) {
           case ' ':
             this.ans.push(this.makeLexer('symbol', '|'));
@@ -103,21 +45,33 @@ class ShellLexer extends Lexer {
             return this.quit();
         }
         break;
-      case 5: {
+      case 2: {
         if (char === '!') {
           this.elems.push(char);
-          this.status = 6;
+          this.status = 3;
         } else {
           return this.quit();
         }
         break;
       }
-      case 6: {
+      case 3: {
         if (char === '\n' || char === 'EOF') {
           this.ans.push(this.makeLexer('hashbangComment', this.elems.join('')));
           return this.quit();
         } else {
           this.elems.push(char);
+        }
+        break;
+      }
+      case 4: {
+        const code = char.charCodeAt(0);
+        if ((code >= 97 && code <= 122) ||
+          (code >= 59 && code <= 64) || (code >= 33 && code <= 42) ||
+          (code >= 47 && code <= 57) || (code >= 123 && code <= 153)) {
+          this.elems.push(char);
+        } else {
+          this.ans.push(this.makeLexer('command', this.elems.join('')));
+          return this.quit();
         }
         break;
       }

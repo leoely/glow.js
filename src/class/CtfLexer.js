@@ -61,7 +61,7 @@ class CtfLexer extends Lexer {
       }
       case 1: {
         if (char === ';' || char === ':') {
-          this.ans.push(this.makeLexer('formate', this.elems.join('')));
+          this.ans.push(this.makeLexer('format', this.elems.join('')));
           return this.quit();
         }
         if (char === '(' || char === '[' || char === '|' || char === ' ' || char === 'EOF') {

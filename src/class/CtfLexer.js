@@ -22,7 +22,7 @@ class CtfLexer extends Lexer {
           (code >= 45 && code <= 47) ||
           (code >= 123 && code <= 153)
         ) && char !== '(' && char !== ')' && char !== '[' && char !== ']' &&
-          char !== '|'
+          char !== '|' && char !== '&'
         ) {
           this.elems = [];
           this.elems.push(char);
@@ -30,6 +30,9 @@ class CtfLexer extends Lexer {
           return;
         }
         switch (char) {
+          case '&':
+            this.ans.push(this.makeLexer('and', '&'));
+            return this.quit();
           case '|':
             this.ans.push(this.makeLexer('dividing', '|'));
             return this.quit();

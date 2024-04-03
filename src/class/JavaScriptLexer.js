@@ -55,8 +55,11 @@ class JavascriptLexer extends Lexer {
       return;
     } else {
       this.identifer = true;
-      this.elems = [];
-      this.elems.push(char);
+      if (char === ' ') {
+        this.elems = [];
+      } else {
+        this.elems.push(char);
+      }
       this.status = 1;
     }
   }

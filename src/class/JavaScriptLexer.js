@@ -43,7 +43,6 @@ class JavascriptLexer extends Lexer {
       } else {
         this.identifer = true;
         this.elems.push(char);
-        console.log(4);
         this.status = 1;
       }
     }
@@ -57,6 +56,7 @@ class JavascriptLexer extends Lexer {
     } else {
       this.identifer = true;
       this.elems = [];
+      this.elems.push(char);
       this.status = 1;
     }
   }
@@ -316,7 +316,6 @@ class JavascriptLexer extends Lexer {
               return;
             default:
               this.identifer = true;
-              return;
           }
         }
         if (char === '0') {
@@ -653,7 +652,6 @@ class JavascriptLexer extends Lexer {
         } else {
           this.identifer = true;
           this.elems.push(char);
-          console.log(2);
           this.status = 1;
         }
         break;

@@ -6,6 +6,6 @@ describe('[class] ShellLexer', () => {
   test('ShellLexer parse result should be correct.', () => {
     const highLight = new HighLight();
     highLight.addLexer(ShellLexer);
-    expect(JSON.stringify(highLight.parse('fulmination parse text.ctf'))).toMatch('[{\"type\":\"command\",\"elem\":\"fulmination\"},{\"type\":\" \"},{\"type\":\"command\",\"elem\":\"parse\"},{\"type\":\" \"},{\"type\":\"command\",\"elem\":\"text\"},{\"type\":\"dot\",\"elem\":\".\"},{\"type\":\"command\",\"elem\":\"ctf\"}]');
+    expect(JSON.stringify(highLight.parse('fulmination parse text.ctf'))).toMatch('[{\"type\":\"command\",\"elem\":\"fulmination\"},{\"type\":\" \"},{\"type\":\"command\",\"elem\":\"parse\"},{\"type\":\" \"},{\"type\":\"filename\",\"elem\":\"text.ctf\"}]');
   });
 });

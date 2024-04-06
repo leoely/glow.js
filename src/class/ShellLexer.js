@@ -12,9 +12,6 @@ class ShellLexer extends Lexer {
           case '-':
             this.ans.push(this.makeLexer('centerLine', '-'));
             return this.quit();
-          case '.':
-            this.ans.push(this.makeLexer('dot', '.'));
-            return this.quit();
           case '|':
             this.status = 1;
             return;
@@ -69,8 +66,23 @@ class ShellLexer extends Lexer {
           (code >= 59 && code <= 64) || (code >= 33 && code <= 42) ||
           (code >= 47 && code <= 57) || (code >= 123 && code <= 153)) {
           this.elems.push(char);
+        } else if (char === '.') {
+          this.elems.push(char);
+          this.status = 5;
         } else {
           this.ans.push(this.makeLexer('command', this.elems.join('')));
+          return this.quit();
+        }
+        break;
+      }
+      case 5: {
+        const code = char.charCodeAt(0);
+        if ((code >= 97 && code <= 122) ||
+          (code >= 59 && code <= 64) || (code >= 33 && code <= 42) ||
+          (code >= 47 && code <= 57) || (code >= 123 && code <= 153)) {
+          this.elems.push(char);
+        } else {
+          this.ans.push(this.makeLexer('filename', this.elems.join('')));
           return this.quit();
         }
         break;

@@ -3,6 +3,12 @@ import Lexer from '~/class/Lexer';
 class ShellLexer extends Lexer {
   constructor(...params) {
     super(...params);
+    this.replace = 'command';
+  }
+
+  checkLexerDuplicate(elem) {
+    const { length, } = this.ans;
+    return this.ans[length - 1].elem === elem;
   }
 
   scan(char) {
@@ -33,9 +39,6 @@ class ShellLexer extends Lexer {
           case '}':
             this.ans.push(this.makeLexer('bigBracket', '}'));
             return this.quit();
-          case '|':
-            this.ans.push(this.makeLexer('diving', '|'));
-            return this.quit();
           case '*':
             this.ans.push(this.makeLexer('asterisk', '*'));
             return this.quit();
@@ -51,7 +54,7 @@ class ShellLexer extends Lexer {
           case ':':
             this.elems = [];
             this.elems.push(char);
-            this.status = 11;
+            this.status = 12;
           case '-':
             this.elems = [];
             this.elems.push(char);
@@ -62,15 +65,23 @@ class ShellLexer extends Lexer {
             this.elems.push(char);
             this.status = 1;
           case '"':
-            this.elems = [];
-            this.elems.push(char);
-            this.status = 5;
-            return;
+            if (!this.checkLexerDuplicate('"')) {
+              this.ans.push(this.makeLexer('singleQuote', '"'));
+              this.elems = [];
+              this.status = 5;
+              return;
+            } else {
+              return this.quit();
+            }
           case "'":
-            this.elems = [];
-            this.elems.push(char);
-            this.status = 6;
-            return;
+            if (!this.checkLexerDuplicate('"')) {
+              this.ans.push(this.makeLexer('doubleQuote', '"'));
+              this.elems = [];
+              this.status = 6;
+              return;
+            } else {
+              return this.quit();
+            }
           case "`":
             this.elems = [];
             this.elems.push(char);
@@ -140,14 +151,16 @@ class ShellLexer extends Lexer {
       case 5:
         if (char === '"') {
           this.ans.push(this.makeLexer('string', this.elems.join('')));
+          this.ans.push(this.makeLexer('doubleQuote', '"'));
           return this.quit();
         } else {
           this.elems.push(char);
         }
         break;
       case 6:
-        if (char === '"') {
+        if (char === "'") {
           this.ans.push(this.makeLexer('string', this.elems.join('')));
+          this.ans.push(this.makeLexer('singleQuote', "'"));
           return this.quit();
         } else {
           this.elems.push(char);
@@ -184,6 +197,7 @@ class ShellLexer extends Lexer {
           this.status = 10;
         } else {
           this.ans.push(this.makeLexer('centerLine', '-'));
+          return this.quit();
         }
         break;
       }

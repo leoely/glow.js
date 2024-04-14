@@ -197,7 +197,7 @@ class ShellLexer extends Lexer {
       }
       case 9: {
         if (char === 'EOF') {
-          his.ans.push(this.makeLexer('centerLine', '-'));
+          this.ans.push(this.makeLexer('centerLine', '-'));
           return this.quit();
         }
         const code = char.charCodeAt(0);

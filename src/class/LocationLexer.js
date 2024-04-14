@@ -19,25 +19,25 @@ class LocationLexer extends Lexer {
         ) {
           this.elems = [];
           this.elems.push(char);
-          this.status = 2;
+          this.status = 1;
           return;
         }
         switch (char) {
           case '/':
-            this.ans.push(this.makeLexer('symbol', '/'));
-            return this.quit();
+            this.status = 2;
+            return;
           case ':':
-            this.ans.push(this.makeLexer('symbol', ':'));
+            this.ans.push(this.makeLexer('colon', ':'));
             return this.quit();
           case '.':
-            this.ans.push(this.makeLexer('symbol', '.'));
+            this.ans.push(this.makeLexer('dot', '.'));
             return this.quit();
           default:
             return this.quit();
         }
         break;
       }
-      case 2: {
+      case 1: {
         const code = char.charCodeAt(0);
         if (char.length === 1) {
           if (
@@ -52,13 +52,19 @@ class LocationLexer extends Lexer {
               this.elems = [];
             }
             this.elems.push(char);
-            return;
+          } else {
+            this.ans.push(this.makeLexer('namespace', this.elems.join('')));
+            return this.quit();
           }
+        } else {
+          this.ans.push(this.makeLexer('namespace', this.elems.join('')));
+          return this.quit();
         }
-        this.ans.push(this.makeLexer('namespace', this.elems.join('')));
-        return this.quit();
         break;
       }
+      case 2:
+        this.ans.push(this.makeLexer('slash', '/'));
+        return this.quit();
       default:
         return this.quit();
     }

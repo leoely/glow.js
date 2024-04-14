@@ -55,6 +55,7 @@ class ShellLexer extends Lexer {
             this.elems = [];
             this.elems.push(char);
             this.status = 12;
+            return;
           case '-':
             this.elems = [];
             this.elems.push(char);
@@ -64,6 +65,7 @@ class ShellLexer extends Lexer {
             this.elems = [];
             this.elems.push(char);
             this.status = 1;
+            return;
           case '"':
             if (!this.checkLexerDuplicate('"')) {
               this.ans.push(this.makeLexer('singleQuote', '"'));
@@ -96,7 +98,7 @@ class ShellLexer extends Lexer {
         const code = char.charCodeAt(0);
         if ((code >= 97 && code <= 122) ||
           (code >= 59 && code <= 64) || (code >= 33 && code <= 42) ||
-          (code >= 47 && code <= 57) || (code >= 123 && code <= 153)) {
+          (code >= 48 && code <= 57) || (code >= 123 && code <= 153)) {
           this.elems = [];
           this.elems.push(char);
           this.status = 3;
@@ -125,11 +127,14 @@ class ShellLexer extends Lexer {
         const code = char.charCodeAt(0);
         if ((code >= 97 && code <= 122) ||
           (code >= 59 && code <= 64) || (code >= 33 && code <= 42) ||
-          (code >= 47 && code <= 57) || (code >= 123 && code <= 153)) {
+          (code >= 48 && code <= 57) || (code >= 123 && code <= 153)) {
           this.elems.push(char);
         } else if (char === '.') {
-          this.elems.push(char);
+          this.ans.push(this.makeLexer('filename', this.elems.join('')));
+          this.ans.push(this.makeLexer('dot', '.'));
+          this.elems = [];
           this.status = 4;
+          return;
         } else {
           this.ans.push(this.makeLexer('command', this.elems.join('')));
           return this.quit();
@@ -140,10 +145,10 @@ class ShellLexer extends Lexer {
         const code = char.charCodeAt(0);
         if ((code >= 97 && code <= 122) ||
           (code >= 59 && code <= 64) || (code >= 33 && code <= 42) ||
-          (code >= 47 && code <= 57) || (code >= 123 && code <= 153)) {
+          (code >= 48 && code <= 57) || (code >= 123 && code <= 153)) {
           this.elems.push(char);
         } else {
-          this.ans.push(this.makeLexer('filename', this.elems.join('')));
+          this.ans.push(this.makeLexer('suffix', this.elems.join('')));
           return this.quit();
         }
         break;
@@ -182,7 +187,7 @@ class ShellLexer extends Lexer {
         const code = char.charCodeAt(0);
         if ((code >= 97 && code <= 122) ||
           (code >= 65 && code <= 95) || (code >= 33 && code <= 42) ||
-          (code >= 45 && code <= 57) || (code >= 123 && code <= 153)) {
+          (code >= 48 && code <= 57) || (code >= 123 && code <= 153)) {
           this.elems.push(char);
         } else {
           this.ans.push(this.makeLexer('variable', this.elems.join('')));

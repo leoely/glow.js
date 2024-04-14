@@ -10,7 +10,7 @@ class Lexer {
     this.i = i;
   }
 
-  makeLexer(type, elem) {
+  makeToken(type, elem) {
     let ans;
     if (elem !== undefined) {
       ans = { type, elem, };

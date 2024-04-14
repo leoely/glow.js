@@ -10,11 +10,11 @@ class VersionLexer extends Lexer {
       case 0: {
         switch (char) {
           case '.':
-            this.ans.push(this.makeLexer('symbol', '.'));
+            this.ans.push(this.makeToken('symbol', '.'));
             return this.quit();
             break;
           case 'v':
-            this.ans.push(this.makeLexer('symbol', 'v'));
+            this.ans.push(this.makeToken('symbol', 'v'));
             return this.quit();
             break;
         }
@@ -31,7 +31,7 @@ class VersionLexer extends Lexer {
         if (code >= 48 && code <= 57) {
           this.elems.push(char);
         } else if (char === '.' || char === 'EOF') {
-          this.ans.push(this.makeLexer('version', this.elems.join('')))
+          this.ans.push(this.makeToken('version', this.elems.join('')))
             return this.quit();
         }
       }

@@ -6,7 +6,7 @@ class JavascriptLexer extends Lexer {
     this.identifer = false;
   }
 
-  checkLexerDuplicate(elem) {
+  checkTokenDuplicate(elem) {
     const { length, } = this.ans;
     return this.ans[length - 1].elem === elem;
   }
@@ -16,7 +16,7 @@ class JavascriptLexer extends Lexer {
       this.elems.push(char);
       this.status = status;
     } else if (char === 'EOF') {
-      this.ans.push(this.makeLexer('identifer', this.elems.join('')));
+      this.ans.push(this.makeToken('identifer', this.elems.join('')));
       return this.quit();
     } else {
       this.identifer = true;
@@ -38,7 +38,7 @@ class JavascriptLexer extends Lexer {
     }
     if (flag === false) {
       if (char === 'EOF') {
-        this.ans.push(this.makeLexer('identifer', this.elems.join('')));
+        this.ans.push(this.makeToken('identifer', this.elems.join('')));
         return this.quit();
       } else {
         this.identifer = true;
@@ -51,7 +51,7 @@ class JavascriptLexer extends Lexer {
   getReserve(char, letter, set) {
     if (char === letter) {
       this.elems.push(char);
-      this.ans.push(this.makeLexer(set, this.elems.join('')));
+      this.ans.push(this.makeToken(set, this.elems.join('')));
       return;
     } else {
       this.identifer = true;
@@ -74,162 +74,162 @@ class JavascriptLexer extends Lexer {
             this.status = 121;
             return;
           case '*':
-            if (!this.checkLexerDuplicate('*')) {
-              this.ans.push(this.makeLexer('symbol', '*'));
+            if (!this.checkTokenDuplicate('*')) {
+              this.ans.push(this.makeToken('symbol', '*'));
               return this.quit();
             }
             break;
           case '<':
-            if (!this.checkLexerDuplicate('<')) {
-              this.ans.push(this.makeLexer('angleBrackets', '<'));
+            if (!this.checkTokenDuplicate('<')) {
+              this.ans.push(this.makeToken('angleBrackets', '<'));
               return this.quit();
             }
             break;
           case '>':
-            if (!this.checkLexerDuplicate('>')) {
-              this.ans.push(this.makeLexer('angleBrackets', '>'));
+            if (!this.checkTokenDuplicate('>')) {
+              this.ans.push(this.makeToken('angleBrackets', '>'));
               return this.quit();
             }
             break;
           case '.':
-            if (!this.checkLexerDuplicate('.')) {
-              this.ans.push(this.makeLexer('call', '.'));
+            if (!this.checkTokenDuplicate('.')) {
+              this.ans.push(this.makeToken('call', '.'));
               return this.quit();
             }
             break;
           case '+':
-            if (!this.checkLexerDuplicate('+')) {
-              this.ans.push(this.makeLexer('arithmetic', '+'));
+            if (!this.checkTokenDuplicate('+')) {
+              this.ans.push(this.makeToken('arithmetic', '+'));
               return this.quit();
             }
             break;
           case '-':
-            if (!this.checkLexerDuplicate('-')) {
-              this.ans.push(this.makeLexer('arithmetic', '-'));
+            if (!this.checkTokenDuplicate('-')) {
+              this.ans.push(this.makeToken('arithmetic', '-'));
               return this.quit();
             }
             break;
           case '^':
-            if (!this.checkLexerDuplicate('^')) {
-              this.ans.push(this.makeLexer('arithmetic', '^'));
+            if (!this.checkTokenDuplicate('^')) {
+              this.ans.push(this.makeToken('arithmetic', '^'));
               return this.quit();
             }
             break;
           case '%':
-            if (!this.checkLexerDuplicate('%')) {
-              this.ans.push(this.makeLexer('arithmetic', '%'));
+            if (!this.checkTokenDuplicate('%')) {
+              this.ans.push(this.makeToken('arithmetic', '%'));
               return this.quit();
             }
             break;
           case '|':
-            if (!this.checkLexerDuplicate('|')) {
-              this.ans.push(this.makeLexer('logic', '|'));
+            if (!this.checkTokenDuplicate('|')) {
+              this.ans.push(this.makeToken('logic', '|'));
               return this.quit();
             }
           case '&':
-            if (!this.checkLexerDuplicate('&')) {
-              this.ans.push(this.makeLexer('logic', '&'));
+            if (!this.checkTokenDuplicate('&')) {
+              this.ans.push(this.makeToken('logic', '&'));
               return this.quit();
             }
             break;
           case '!':
-            if (!this.checkLexerDuplicate('!')) {
-              this.ans.push(this.makeLexer('logic', '!'));
+            if (!this.checkTokenDuplicate('!')) {
+              this.ans.push(this.makeToken('logic', '!'));
               return this.quit();
             }
             break;
           case '~':
-            if (!this.checkLexerDuplicate('~')) {
-              this.ans.push(this.makeLexer('logic', '~'));
+            if (!this.checkTokenDuplicate('~')) {
+              this.ans.push(this.makeToken('logic', '~'));
               return this.quit();
             }
             break;
           case '?':
-            if (!this.checkLexerDuplicate('?')) {
-              this.ans.push(this.makeLexer('logic', '?'));
+            if (!this.checkTokenDuplicate('?')) {
+              this.ans.push(this.makeToken('logic', '?'));
               return this.quit();
             }
             break;
           case '=':
-            if (!this.checkLexerDuplicate('=')) {
-              this.ans.push(this.makeLexer('arithmetic', '='));
+            if (!this.checkTokenDuplicate('=')) {
+              this.ans.push(this.makeToken('arithmetic', '='));
               return this.quit();
             }
             break;
           case '(':
-            if (!this.checkLexerDuplicate('(')) {
-              this.ans.push(this.makeLexer('parenthese', '('));
+            if (!this.checkTokenDuplicate('(')) {
+              this.ans.push(this.makeToken('parenthese', '('));
               return this.quit();
             }
             break;
           case ')':
-            if (!this.checkLexerDuplicate(')')) {
-              this.ans.push(this.makeLexer('parenthese', ')'));
+            if (!this.checkTokenDuplicate(')')) {
+              this.ans.push(this.makeToken('parenthese', ')'));
               return this.quit();
             }
             break;
           case '{':
-            if (!this.checkLexerDuplicate('{')) {
-              this.ans.push(this.makeLexer('curlyParenthese', '{'));
+            if (!this.checkTokenDuplicate('{')) {
+              this.ans.push(this.makeToken('curlyParenthese', '{'));
               return this.quit();
             }
             break;
           case '}':
-            if (!this.checkLexerDuplicate('}')) {
-              this.ans.push(this.makeLexer('curlyParenthese', '}'));
+            if (!this.checkTokenDuplicate('}')) {
+              this.ans.push(this.makeToken('curlyParenthese', '}'));
               return this.quit();
             }
             break;
           case '[':
-            if (!this.checkLexerDuplicate('[')) {
-              this.ans.push(this.makeLexer('squareParenthese', '['));
+            if (!this.checkTokenDuplicate('[')) {
+              this.ans.push(this.makeToken('squareParenthese', '['));
               return this.quit();
             }
             break;
           case ']':
-            if (!this.checkLexerDuplicate(']')) {
-              this.ans.push(this.makeLexer('squareParenthese', ']'));
+            if (!this.checkTokenDuplicate(']')) {
+              this.ans.push(this.makeToken('squareParenthese', ']'));
               return this.quit();
             }
             break;
           case ';':
-            if (!this.checkLexerDuplicate(';')) {
-              this.ans.push(this.makeLexer('function', ';'));
+            if (!this.checkTokenDuplicate(';')) {
+              this.ans.push(this.makeToken('function', ';'));
               return this.quit();
             }
             break;
           case ':':
-            if (!this.checkLexerDuplicate(':')) {
-              this.ans.push(this.makeLexer('iteral', ':'));
+            if (!this.checkTokenDuplicate(':')) {
+              this.ans.push(this.makeToken('iteral', ':'));
               return this.quit();
             }
             break;
           case ',':
-            if (!this.checkLexerDuplicate(',')) {
-              this.ans.push(this.makeLexer('iteral', ','));
+            if (!this.checkTokenDuplicate(',')) {
+              this.ans.push(this.makeToken('iteral', ','));
               return this.quit();
             }
             break;
           case '"': {
-            if (!this.checkLexerDuplicate('"')) {
+            if (!this.checkTokenDuplicate('"')) {
               this.elems = [];
-              this.ans.push(this.makeLexer('quotation', '"'));
+              this.ans.push(this.makeToken('quotation', '"'));
               this.status = 3;
             }
             break;
           }
           case "'": {
-            if (!this.checkLexerDuplicate("'")) {
+            if (!this.checkTokenDuplicate("'")) {
               this.elems = [];
-              this.ans.push(this.makeLexer('quotation', "'"));
+              this.ans.push(this.makeToken('quotation', "'"));
               this.status = 4;
             }
             break;
           }
           case '`': {
-            if (!this.checkLexerDuplicate('`')) {
+            if (!this.checkTokenDuplicate('`')) {
               this.elems = [];
-              this.ans.push(this.makeLexer('quotation', '`'));
+              this.ans.push(this.makeToken('quotation', '`'));
               this.status = 125;
             }
             break;
@@ -353,7 +353,7 @@ class JavascriptLexer extends Lexer {
       }
       case 1: {
         if (char === 'EOF') {
-          this.ans.push(this.makeLexer('identifer', this.elems.join('')));
+          this.ans.push(this.makeToken('identifer', this.elems.join('')));
           return this.quit();
         }
         const code = char.charCodeAt(0);
@@ -367,7 +367,7 @@ class JavascriptLexer extends Lexer {
           this.status = 2;
           this.elems.push(char);
         } else {
-          this.ans.push(this.makeLexer('identifer', this.elems.join('')));
+          this.ans.push(this.makeToken('identifer', this.elems.join('')));
           return this.quit();
         }
         break;
@@ -377,15 +377,15 @@ class JavascriptLexer extends Lexer {
         if (code >= 48 && code <= 57) {
           this.elems.push(char);
         } else {
-          this.ans.push(this.makeLexer('identifer', this.elems.join('')));
+          this.ans.push(this.makeToken('identifer', this.elems.join('')));
           return this.quit();
         }
         break;
       }
       case 3: {
         if (char === '"') {
-          this.ans.push(this.makeLexer('string', this.elems.join('')));
-          this.ans.push(this.makeLexer('quotation', '"'));
+          this.ans.push(this.makeToken('string', this.elems.join('')));
+          this.ans.push(this.makeToken('quotation', '"'));
           return this.quit();
         } else {
           this.elems.push(char);
@@ -394,8 +394,8 @@ class JavascriptLexer extends Lexer {
       }
       case 4: {
         if (char === "'") {
-          this.ans.push(this.makeLexer('string', this.elems.join('')));
-          this.ans.push(this.makeLexer('quotation', "'"));
+          this.ans.push(this.makeToken('string', this.elems.join('')));
+          this.ans.push(this.makeToken('quotation', "'"));
           return this.quit();
         } else {
           this.elems.push(char);
@@ -487,10 +487,10 @@ class JavascriptLexer extends Lexer {
           this.status = 29;
         } else if (char === 'o') {
           this.elems.push(char);
-          this.ans.push(this.makeLexer('while', this.elems.join('')));
+          this.ans.push(this.makeToken('while', this.elems.join('')));
           this.quit();
         } else if (char === 'EOF') {
-          this.ans.push(this.makeLexer('identifer', this.elems.join('')));
+          this.ans.push(this.makeToken('identifer', this.elems.join('')));
           this.quit();
         } else {
           this.identifer = true;
@@ -647,10 +647,10 @@ class JavascriptLexer extends Lexer {
           this.status = 69;
         } else if (char === 'f') {
           this.elems.push(char);
-          this.ans.push(this.makeLexer('if', this.elems.join('')));
+          this.ans.push(this.makeToken('if', this.elems.join('')));
           return this.quit();
         } else if (char === 'EOF') {
-          this.ans.push(this.makeLexer('identifer', this.elems.join('')));
+          this.ans.push(this.makeToken('identifer', this.elems.join('')));
           return this.quit();
         } else {
           this.identifer = true;
@@ -679,7 +679,7 @@ class JavascriptLexer extends Lexer {
         if (code >= 99 && code <= 122) {
           this.readReserveLetter(char, 's', 70);
         } else {
-          this.ans.push(this.makeLexer('in', 'in'));
+          this.ans.push(this.makeToken('in', 'in'));
           return this.quit();
         }
         break;
@@ -834,10 +834,10 @@ class JavascriptLexer extends Lexer {
           this.status = 106;
         } else if (char === 'y') {
           this.elems.push(char);
-          this.ans.push(this.makeLexer('try', this.elems.join('')));
+          this.ans.push(this.makeToken('try', this.elems.join('')));
           return this.quit();
         } else if (char === 'EOF') {
-          this.ans.push(this.makeLexer('identifer', this.elems.join('')));
+          this.ans.push(this.makeToken('identifer', this.elems.join('')));
           return this.quit();
         } else {
           this.identifer = true;
@@ -913,7 +913,7 @@ class JavascriptLexer extends Lexer {
         } else if (char === '*') {
           this.status = 123;
         } else {
-          this.ans.push(this.makeLexer('arithmetic', '/'));
+          this.ans.push(this.makeToken('arithmetic', '/'));
           return this.quit();
         }
         break;
@@ -921,7 +921,7 @@ class JavascriptLexer extends Lexer {
       case 122: {
         this.elems.push(char);
         if (char === '\n') {
-          this.ans.push(this.makeLexer('lineComment', this.elems.join('')));
+          this.ans.push(this.makeToken('lineComment', this.elems.join('')));
           return this.quit();
         }
         break;
@@ -938,7 +938,7 @@ class JavascriptLexer extends Lexer {
       case 124: {
         if (char === '/') {
           this.elems.push(char);
-          this.ans.push(this.makeLexer('blockComment', this.elems.join('')));
+          this.ans.push(this.makeToken('blockComment', this.elems.join('')));
         } else {
           return this.quit();
         }
@@ -946,8 +946,8 @@ class JavascriptLexer extends Lexer {
       }
       case 125: {
         if (char === '`') {
-          this.ans.push(this.makeLexer('string', this.elems.join('')));
-          this.ans.push(this.makeLexer('quotation', "'"));
+          this.ans.push(this.makeToken('string', this.elems.join('')));
+          this.ans.push(this.makeToken('quotation', "'"));
           return this.quit();
         } else {
           this.elems.push(char);
@@ -957,7 +957,7 @@ class JavascriptLexer extends Lexer {
       case 126: {
         const code = char.charCodeAt(0);
         if (char === 'EOF') {
-          this.ans.push(this.makeLexer('decimal', this.elems.join('')));
+          this.ans.push(this.makeToken('decimal', this.elems.join('')));
           return this.quit();
         } else if (
           (code >= 48 && code <= 57) ||
@@ -966,10 +966,10 @@ class JavascriptLexer extends Lexer {
           this.elems.push(char);
         } else if (char === 'n') {
           this.elems.push(char);
-          this.ans.push(this.makeLexer('decimal', this.elems.join('')));
+          this.ans.push(this.makeToken('decimal', this.elems.join('')));
           return this.quit();
         } else {
-          this.ans.push(this.makeLexer('decimal', this.elems.join('')));
+          this.ans.push(this.makeToken('decimal', this.elems.join('')));
           return this.quit();
         }
         break;
@@ -986,7 +986,7 @@ class JavascriptLexer extends Lexer {
       case 128: {
         const code = char.charCodeAt(0);
         if (char === 'EOF') {
-          this.ans.push(this.makeLexer('decimal', this.elems.join('')));
+          this.ans.push(this.makeToken('decimal', this.elems.join('')));
           return this.quit();
         } else if (
           (code >= 48 && code <= 57) || (code >= 65 && code <= 70) ||
@@ -996,10 +996,10 @@ class JavascriptLexer extends Lexer {
           this.elems.push(char);
         } else if (char === 'n') {
           this.elems.push(char);
-          this.ans.push(this.makeLexer('decimal', this.elems.join('')));
+          this.ans.push(this.makeToken('decimal', this.elems.join('')));
           return this.quit();
         } else {
-          this.ans.push(this.makeLexer('decimal', this.elems.join('')));
+          this.ans.push(this.makeToken('decimal', this.elems.join('')));
           return this.quit();
         }
         break;
@@ -1007,7 +1007,7 @@ class JavascriptLexer extends Lexer {
       case 129: {
         const code = char.charCodeAt(0);
         if (char === 'EOF') {
-          this.ans.push(this.makeLexer('decimal', this.elems.join('')));
+          this.ans.push(this.makeToken('decimal', this.elems.join('')));
           return this.quit();
         } else if (
           (code >= 48 && code <= 55) ||
@@ -1016,7 +1016,7 @@ class JavascriptLexer extends Lexer {
           this.elems.push(char);
         } else if (char === 'n') {
           this.elems.push(char);
-          this.ans.push(this.makeLexer('decimal', this.elems.join('')));
+          this.ans.push(this.makeToken('decimal', this.elems.join('')));
           return this.quit();
         } else {
           this.elems.push(char);
@@ -1027,7 +1027,7 @@ class JavascriptLexer extends Lexer {
       case 130: {
         const code = char.charCodeAt(0);
         if (char === 'EOF') {
-          this.ans.push(this.makeLexer('decimal', this.elems.join('')));
+          this.ans.push(this.makeToken('decimal', this.elems.join('')));
           return this.quit();
         } else if (
           (code >= 48 && code <= 57) || char === '_' || char === '.' ||
@@ -1036,10 +1036,10 @@ class JavascriptLexer extends Lexer {
           this.elems.push(char);
         } else if (char === 'n') {
           this.elems.push(char);
-          this.ans.push(this.makeLexer('decimal', this.elems.join('')));
+          this.ans.push(this.makeToken('decimal', this.elems.join('')));
           return this.quit();
         } else {
-          this.ans.push(this.makeLexer('decimal', this.elems.join('')));
+          this.ans.push(this.makeToken('decimal', this.elems.join('')));
           return this.quit();
         }
         break;

@@ -5,7 +5,7 @@ class CtfLexer extends Lexer {
     super(...param);
   }
 
-  checkLexerDuplicate(elem) {
+  checkTokenDuplicate(elem) {
     const { length, } = this.ans;
     return this.ans[length - 1].elem === elem;
   }
@@ -31,44 +31,44 @@ class CtfLexer extends Lexer {
         }
         switch (char) {
           case '&':
-            this.ans.push(this.makeLexer('and', '&'));
+            this.ans.push(this.makeToken('and', '&'));
             return this.quit();
           case '|':
-            this.ans.push(this.makeLexer('dividing', '|'));
+            this.ans.push(this.makeToken('dividing', '|'));
             return this.quit();
           case '+':
-            this.ans.push(this.makeLexer('plus', '+'));
+            this.ans.push(this.makeToken('plus', '+'));
             return this.quit();
           case '(':
-            this.ans.push(this.makeLexer('parenthese', '('));
+            this.ans.push(this.makeToken('parenthese', '('));
             return this.quit();
           case ')':
-            this.ans.push(this.makeLexer('parenthese', ')'));
+            this.ans.push(this.makeToken('parenthese', ')'));
             this.quit();
             break;
           case '[':
-            this.ans.push(this.makeLexer('squareParenthese', '['));
+            this.ans.push(this.makeToken('squareParenthese', '['));
             return this.quit();
           case ']':
-            this.ans.push(this.makeLexer('squareParenthese', ']'));
+            this.ans.push(this.makeToken('squareParenthese', ']'));
             return this.quit();
             break;
           case ',':
-            this.ans.push(this.makeLexer('comma', ','));
+            this.ans.push(this.makeToken('comma', ','));
             return this.quit();
           case ':':
-            this.ans.push(this.makeLexer('colon', ':'));
+            this.ans.push(this.makeToken('colon', ':'));
             return this.quit();
         }
         break;
       }
       case 1: {
         if (char === ';' || char === ':') {
-          this.ans.push(this.makeLexer('format', this.elems.join('')));
+          this.ans.push(this.makeToken('format', this.elems.join('')));
           return this.quit();
         }
         if (char === '(' || char === '[' || char === '|' || char === ' ' || char === 'EOF') {
-          this.ans.push(this.makeLexer('text', this.elems.join('')));
+          this.ans.push(this.makeToken('text', this.elems.join('')));
           return this.quit();
         }
         this.elems.push(char);

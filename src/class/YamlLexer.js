@@ -33,15 +33,15 @@ class YamlLexer extends Lexer {
         }
         switch (char) {
           case '"':
-            this.ans.push(this.makeLexer('string', '"'));
+            this.ans.push(this.makeToken('string', '"'));
             this.elems = [];
             this.status = 2;
             break;
           case '-':
-            this.ans.push(this.makeLexer('list', '-'));
+            this.ans.push(this.makeToken('list', '-'));
             return this.quit();
           case '.':
-            this.ans.push(this.makeLexer('symbol', '.'));
+            this.ans.push(this.makeToken('symbol', '.'));
             return this.quit();
           case '(':
             this.elems = [];
@@ -54,12 +54,12 @@ class YamlLexer extends Lexer {
       }
       case 1:
         if (char === ':') {
-          this.ans.push(this.makeLexer('key', this.elems.join('')));
-          this.ans.push(this.makeLexer('definition', ':'));
+          this.ans.push(this.makeToken('key', this.elems.join('')));
+          this.ans.push(this.makeToken('definition', ':'));
           return this.quit();
         } else {
           if (char === ' ' || char === '\n' || char === 'EOF') {
-            this.ans.push(this.makeLexer('value', this.elems.join('')));
+            this.ans.push(this.makeToken('value', this.elems.join('')));
             return this.quit();
           } else {
             this.elems.push(char);
@@ -75,7 +75,7 @@ class YamlLexer extends Lexer {
         break;
       case 3:
         if (char === '\n' || char === 'EOF') {
-          this.ans.push(this.makeLexer('comment', this.elems.join('')));
+          this.ans.push(this.makeToken('comment', this.elems.join('')));
           return this.quit();
         } else {
           this.elems.push(char);
@@ -83,9 +83,9 @@ class YamlLexer extends Lexer {
         break;
       case 4: {
         if (char === ')') {
-          this.ans.push(this.makeLexer('('));
-          this.ans.push(this.makeLexer('unit', this.elems.join('')));
-          this.ans.push(this.makeLexer(')'));
+          this.ans.push(this.makeToken('('));
+          this.ans.push(this.makeToken('unit', this.elems.join('')));
+          this.ans.push(this.makeToken(')'));
           return this.quit();
         } else {
           this.elems.push(char);
@@ -97,7 +97,7 @@ class YamlLexer extends Lexer {
         if (code >= 48 && code <= 57) {
           this.elems.push(char);
         } else {
-          this.ans.push(this.makeLexer('number', this.elems.join('')));
+          this.ans.push(this.makeToken('number', this.elems.join('')));
           return this.quit();
         }
         break;

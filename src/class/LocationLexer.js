@@ -27,10 +27,10 @@ class LocationLexer extends Lexer {
             this.status = 2;
             return;
           case ':':
-            this.ans.push(this.makeLexer('colon', ':'));
+            this.ans.push(this.makeToken('colon', ':'));
             return this.quit();
           case '.':
-            this.ans.push(this.makeLexer('dot', '.'));
+            this.ans.push(this.makeToken('dot', '.'));
             return this.quit();
           default:
             return this.quit();
@@ -53,17 +53,17 @@ class LocationLexer extends Lexer {
             }
             this.elems.push(char);
           } else {
-            this.ans.push(this.makeLexer('namespace', this.elems.join('')));
+            this.ans.push(this.makeToken('namespace', this.elems.join('')));
             return this.quit();
           }
         } else {
-          this.ans.push(this.makeLexer('namespace', this.elems.join('')));
+          this.ans.push(this.makeToken('namespace', this.elems.join('')));
           return this.quit();
         }
         break;
       }
       case 2:
-        this.ans.push(this.makeLexer('slash', '/'));
+        this.ans.push(this.makeToken('slash', '/'));
         return this.quit();
       default:
         return this.quit();

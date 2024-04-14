@@ -196,6 +196,10 @@ class ShellLexer extends Lexer {
         break;
       }
       case 9: {
+        if (char === 'EOF') {
+          his.ans.push(this.makeLexer('centerLine', '-'));
+          return this.quit();
+        }
         const code = char.charCodeAt(0);
         if ((code >= 97 && code <= 122) || (code >= 65 && code <= 95)) {
           this.elems.push(char);

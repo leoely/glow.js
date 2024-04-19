@@ -52,6 +52,7 @@ class JavascriptLexer extends Lexer {
     if (char === letter) {
       this.elems.push(char);
       this.ans.push(this.makeToken(set, this.elems.join('')));
+      this.elems = [];
       return;
     } else {
       this.identifer = true;
@@ -61,6 +62,10 @@ class JavascriptLexer extends Lexer {
         this.elems.push(char);
       }
       this.status = 1;
+      if (char === '(') {
+        this.elems = [];
+        this.ans.push(this.makeToken('parenthese', '('));
+      }
     }
   }
 

@@ -61,10 +61,11 @@ class JavascriptLexer extends Lexer {
       } else {
         this.elems.push(char);
       }
-      this.status = 1;
-      if (char === '(') {
-        this.elems = [];
-        this.ans.push(this.makeToken('parenthese', '('));
+      const code = char.charCodeAt(0);
+      if ((code <= 122 && code >= 97) || (code >= 65 && code <= 90)) {
+        this.status = 1;
+      } else {
+        return this.quit();
       }
     }
   }

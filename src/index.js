@@ -5,11 +5,3 @@ export { default as ShellLexer, } from '~/class/ShellLexer';
 export { default as VersionLexer, }from '~/class/VersionLexer';
 export { default as YamlLexer, } from '~/class/VersionLexer';
 export { default as CtfLexer, } from '~/class/CtfLexer';
-
-import HighLight from '~/class/HighLight';
-import JavascriptLexer from '~/class/JavascriptLexer';
-
-const highLight = new HighLight();
-highLight.addLexer(JavascriptLexer);
-
-console.log(highLight.parse('delete(51, 40)'));

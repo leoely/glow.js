@@ -1,6 +1,6 @@
-import ComplexLexer from '~/class/ComplexLexer';
+import Lexer from '~/class/Lexer';
 
-class ShellLexer extends ComplexLexer {
+class ShellLexer extends Lexer {
   constructor(...params) {
     super(...params);
     this.replace = 'command';
@@ -19,7 +19,6 @@ class ShellLexer extends ComplexLexer {
       this.ans.push(this.makeToken('identifer', this.elems.join('')));
       return this.quit();
     } else {
-      this.identifer = true;
       this.elems.push(char);
       this.status = 3;
     }

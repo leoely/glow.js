@@ -15,7 +15,7 @@ class JavascriptLexer extends Lexer {
     if (char === letter) {
       this.elems.push(char);
       this.status = status;
-    } else if (char === 'EOF') {
+    } else if (char === 'EOF' || char === ' ' || char === ';') {
       this.ans.push(this.makeToken('identifer', this.elems.join('')));
       return this.quit();
     } else {
@@ -37,7 +37,7 @@ class JavascriptLexer extends Lexer {
       }
     }
     if (flag === false) {
-      if (char === 'EOF') {
+      if (char === 'EOF' || char === ' ') {
         this.ans.push(this.makeToken('identifer', this.elems.join('')));
         return this.quit();
       } else {
@@ -49,24 +49,17 @@ class JavascriptLexer extends Lexer {
   }
 
   getReserve(char, letter, set) {
-    if (char === letter) {
-      this.elems.push(char);
+    if (char === letter || char === ';' || char === 'EOF' || char === '(' ||
+      char === '{' || char === ':' || char === '&' || char === '|' ||
+      char === ' ' || char === '.'
+    ) {
       this.ans.push(this.makeToken(set, this.elems.join('')));
       this.elems = [];
-      return;
+      return this.quit();
     } else {
       this.identifer = true;
-      if (char === ' ') {
-        this.elems = [];
-      } else {
-        this.elems.push(char);
-      }
-      const code = char.charCodeAt(0);
-      if ((code <= 122 && code >= 97) || (code >= 65 && code <= 90)) {
-        this.status = 1;
-      } else {
-        return this.quit();
-      }
+      this.status = 1;
+      this.elems.push(char);
     }
   }
 
@@ -199,10 +192,8 @@ class JavascriptLexer extends Lexer {
             }
             break;
           case ';':
-            if (!this.checkTokenDuplicate(';')) {
-              this.ans.push(this.makeToken('function', ';'));
-              return this.quit();
-            }
+            this.ans.push(this.makeToken('function', ';'));
+            return this.quit();
             break;
           case ':':
             if (!this.checkTokenDuplicate(':')) {
@@ -365,8 +356,7 @@ class JavascriptLexer extends Lexer {
         const code = char.charCodeAt(0);
         if (
           (code >= 97 && code <= 122) ||
-          (code >= 65 && code <= 90) ||
-          (code > 58 && code <= 64) || (code === 95)
+          (code >= 65 && code <= 90)
         ) {
           this.elems.push(char);
         } else if (code >= 48 && code <= 57) {
@@ -388,7 +378,7 @@ class JavascriptLexer extends Lexer {
         }
         break;
       }
-      case 3: {
+      case 3:
         if (char === '"') {
           this.ans.push(this.makeToken('string', this.elems.join('')));
           this.ans.push(this.makeToken('quotation', '"'));
@@ -397,8 +387,7 @@ class JavascriptLexer extends Lexer {
           this.elems.push(char);
         }
         break;
-      }
-      case 4: {
+      case 4:
         if (char === "'") {
           this.ans.push(this.makeToken('string', this.elems.join('')));
           this.ans.push(this.makeToken('quotation', "'"));
@@ -407,244 +396,155 @@ class JavascriptLexer extends Lexer {
           this.elems.push(char);
         }
         break;
-      }
-      case 5: {
+      case 5:
         return this.readReserveLetter(char, 'w', 6);
-      }
-      case 6: {
+      case 6:
         return this.readReserveLetter(char, 'a', 7);
-      }
-      case 7: {
+      case 7:
         return this.readReserveLetter(char, 'i', 8);
-      }
-      case 8: {
-        return this.getReserve(char, 't', 'async');
-      }
-      case 9: {
+      case 8:
+        return this.readReserveLetter(char, 't', 132);
+      case 9:
         return this.readReserveLetter(char, 'r', 10);
-      }
-      case 10: {
+      case 10:
         return this.readReserveLetter(char, 'e', 11);
-      }
-      case 11: {
+      case 11:
         return this.readReserveLetter(char, 'a', 12);
-      }
-      case 12: {
-        return  this.getReserve(char, 'k', 'for');
-      }
-      case 13: {
+      case 12:
+        return this.readReserveLetter(char, 'k', 133);
+      case 13:
         return this.readReserveLetters(char, [
           ['a', 14],
           ['l', 18],
           ['o', 21],
         ]);
-      }
-      case 14: {
+      case 14:
         return this.readReserveLetters(char, [
           ['s', 15],
           ['t', 16],
         ]);
-      }
-      case 15: {
-        return this.getReserve(char, 'e', 'switch');
-      }
-      case 16: {
+      case 15:
+        return this.readReserveLetter(char, 'e', 134);
+      case 16:
         return this.readReserveLetter(char, 'c', 17);
-      }
-      case 17: {
-        return this.getReserve(char, 'h', 'try');
-      }
-      case 18: {
+      case 17:
+        return this.readReserveLetter(char, 'h', 135);
+      case 18:
         return this.readReserveLetter(char, 'a', 19);
-      }
-      case 19: {
+      case 19:
         return this.readReserveLetter(char, 's', 20);
-      }
-      case 20: {
-        return this.getReserve(char, 's', 'class');
-      }
-      case 21: {
+      case 20:
+        return this.readReserveLetter(char, 's', 136);
+      case 21:
         return this.readReserveLetter(char, 'n', 22);
-      }
-      case 22: {
+      case 22:
         return this.readReserveLetters(char, [
           ['s', 27],
           ['t', 23],
         ]);
-      }
-      case 23: {
+      case 23:
         return this.readReserveLetter(char, 'i', 24);
-      }
-      case 24: {
+      case 24:
         return this.readReserveLetter(char, 'n', 25);
-      }
-      case 25: {
+      case 25:
         return this.readReserveLetter(char, 'u', 26);
-      }
-      case 26: {
-        return this.getReserve(char, 'e', 'for');
-      }
-      case 27: {
-        return this.getReserve(char, 't', 'declare');
-      }
-      case 28: {
+      case 26:
+        return this.readReserveLetter(char, 'e', 137);
+      case 27:
+        return this.readReserveLetter(char, 't', 138);
+      case 28:
         if (char === 'e') {
           this.elems.push(char);
           this.status = 29;
         } else if (char === 'o') {
-          this.elems.push(char);
-          this.ans.push(this.makeToken('while', this.elems.join('')));
-          this.quit();
-        } else if (char === 'EOF') {
-          this.ans.push(this.makeToken('identifer', this.elems.join('')));
-          this.quit();
-        } else {
-          this.identifer = true;
-          this.elems.push(char);
-          this.status = 1;
+          this.elems.push(char)
         }
         break;
-      }
-      case 29: {
-        this.readReserveLetters(char, [
+      case 29:
+        return this.readReserveLetters(char, [
           ['b', 30],
           ['f', 35],
           ['l', 39]
         ]);
-        break;
-      }
-      case 30: {
-        this.readReserveLetter(char, 'u', 31);
-        break;
-      }
-      case 31: {
-        this.readReserveLetter(char, 'g', 32);
-        break;
-      }
-      case 32: {
-        this.readReserveLetter(char, 'g', 33);
-        break;
-      }
-      case 33: {
-        this.readReserveLetter(char, 'e', 34);
-        break;
-      }
-      case 34: {
-        return this.getReserve(char, 'r', 'debugger');
-      }
-      case 35: {
-        this.readReserveLetter(char, 'a', 36);
-        break;
-      }
-      case 36: {
-        this.readReserveLetter(char, 'u', 37);
-        break;
-      }
-      case 37: {
-        this.readReserveLetter(char, 'l', 38);
-        break;
-      }
-      case 38: {
-        return this.getReserve(char, 't', 'switch');
-      }
-      case 39: {
-        this.readReserveLetter(char, 'e', 40);
-        break;
-      }
-      case 40: {
-        this.readReserveLetter(char, 't', 41);
-        break;
-      }
-      case 41: {
-        return this.getReserve(char, 'e', 'delete');
-      }
-      case 42: {
-        this.readReserveLetters(char, [
+      case 30:
+        return this.readReserveLetter(char, 'u', 31);
+      case 31:
+        return this.readReserveLetter(char, 'g', 32);
+      case 32:
+        return this.readReserveLetter(char, 'g', 33);
+      case 33:
+        return this.readReserveLetter(char, 'e', 34);
+      case 34:
+        return this.readReserveLetter(char, 'r', 140);
+      case 35:
+        return this.readReserveLetter(char, 'a', 36);
+      case 36:
+        return this.readReserveLetter(char, 'u', 37);
+      case 37:
+        return this.readReserveLetter(char, 'l', 38);
+      case 38:
+        return this.readReserveLetter(char, 't', 143);
+      case 39:
+        return this.readReserveLetter(char, 'e', 40);
+      case 40:
+        return this.readReserveLetter(char, 't', 41);
+      case 41:
+        return this.readReserveLetter(char, 'e', 131);
+      case 42:
+        return this.readReserveLetters(char, [
           ['l', 43],
           ['x', 45],
         ]);
-        break;
-      }
-      case 43: {
-        this.readReserveLetter(char, 's', 44);
-        break;
-      }
-      case 44: {
-        return this.getReserve(char, 'e', 'if');
-      }
-      case 45: {
-        this.readReserveLetters(char, [
+      case 43:
+        return this.readReserveLetter(char, 's', 44);
+      case 44:
+        return this.readReserveLetter(char, 'e', 141);
+      case 45:
+        return this.readReserveLetters(char, [
           ['p', 46],
           ['t', 49],
         ]);
-        break;
-      }
-      case 46: {
-        this.readReserveLetter(char, 'o', 47);
-        break;
-      }
-      case 47: {
-        this.readReserveLetter(char, 'r', 48);
-        break;
-      }
-      case 48: {
-        return this.getReserve(char, 't', 'module');
-      }
-      case 49: {
-        this.readReserveLetter(char, 'e', 50);
-        break;
-      }
-      case 50: {
-        this.readReserveLetter(char, 'n', 51);
-        break;
-      }
-      case 51: {
-        this.readReserveLetter(char, 'd', 52);
-        break;
-      }
-      case 52: {
-        return this.getReserve(char, 's', 'class');
-      }
-      case 53: {
+      case 46:
+        return this.readReserveLetter(char, 'o', 47);
+      case 47:
+        return this.readReserveLetter(char, 'r', 48);
+      case 48:
+        return this.readReserveLetter(char, 't', 142);
+      case 49:
+        return this.readReserveLetter(char, 'e', 50);
+      case 50:
+        return this.readReserveLetter(char, 'n', 51);
+      case 51:
+        return this.readReserveLetter(char, 'd', 52);
+      case 52:
+        return this.readReserveLetter(char, 's', 144);
+      case 53:
         return this.readReserveLetters(char, [
           ['a', 54],
           ['o', 57],
           ['u', 58],
         ]);
-      }
-      case 54: {
-        this.readReserveLetter(char, 'l', 55);
-        break;
-      }
-      case 55: {
-        this.readReserveLetter(char, 's', 56);
-        break;
-      }
-      case 56: {
-        return this.getReserve(char, 'e', 'if');
-      }
-      case 57: {
-        return this.getReserve(char, 'r', 'for');
-      }
-      case 58: {
+      case 54:
+        return this.readReserveLetter(char, 'l', 55);
+      case 55:
+        return this.readReserveLetter(char, 's', 56);
+      case 56:
+        return this.readReserveLetter(char, 'e', 145);
+      case 57:
+        return this.readReserveLetter(char, 'r', 146);
+      case 58:
         return this.readReserveLetter(char, 'n', 59);
-      }
-      case 59: {
+      case 59:
         return this.readReserveLetter(char, 'c', 60);
-      }
-      case 60: {
+      case 60:
         return this.readReserveLetter(char, 't', 61);
-      }
-      case 61: {
+      case 61:
         return this.readReserveLetter(char, 'i', 62);
-      }
-      case 62: {
+      case 62:
         return this.readReserveLetter(char, 'o', 63);
-      }
-      case 63: {
-        return this.getReserve(char, 'n', 'declare');
-      }
-      case 64: {
+      case 63:
+        return this.readReserveLetter(char, 'n', 147);
+      case 64:
         if (char === 'm') {
           this.elems.push(char);
           this.status = 65;
@@ -653,8 +553,7 @@ class JavascriptLexer extends Lexer {
           this.status = 69;
         } else if (char === 'f') {
           this.elems.push(char);
-          this.ans.push(this.makeToken('if', this.elems.join('')));
-          return this.quit();
+          this.status = 148;
         } else if (char === 'EOF') {
           this.ans.push(this.makeToken('identifer', this.elems.join('')));
           return this.quit();
@@ -664,185 +563,117 @@ class JavascriptLexer extends Lexer {
           this.status = 1;
         }
         break;
-      }
-      case 65: {
-        this.readReserveLetter(char, 'p', 66);
-        break;
-      }
-      case 66: {
-        this.readReserveLetter(char, 'o', 67);
-        break;
-      }
-      case 67: {
-        this.readReserveLetter(char, 'r', 68);
-        break;
-      }
-      case 68: {
-        return this.getReserve(char, 't', 'module');
-      }
+      case 65:
+        return this.readReserveLetter(char, 'p', 66);
+      case 66:
+        return this.readReserveLetter(char, 'o', 67);
+      case 67:
+        return this.readReserveLetter(char, 'r', 68);
+      case 68:
+        return this.readReserveLetter(char, 't', 149);
       case 69: {
         const code = char.charCodeAt(0);
         if (code >= 99 && code <= 122) {
           this.readReserveLetter(char, 's', 70);
         } else {
-          this.ans.push(this.makeToken('in', 'in'));
+          this.ans.push(this.makeToken(this.elems.join(''), 'function'));
           return this.quit();
         }
         break;
       }
-      case 70: {
-        this.readReserveLetter(char, 't', 71);
-        break;
-      }
-      case 71: {
-        this.readReserveLetter(char, 'a', 72);
-        break;
-      }
-      case 72: {
-        this.readReserveLetter(char, 'n', 73);
-        break;
-      }
-      case 73: {
-        this.readReserveLetter(char, 'c', 74);
-        break;
-      }
-      case 74: {
-        this.readReserveLetter(char, 'e', 75);
-        break;
-      }
-      case 75: {
-        this.readReserveLetter(char, 'o', 76);
-        break;
-      }
-      case 76: {
-        return this.getReserve(char, 'f', 'instanceof');
-      }
-      case 77: {
-        this.readReserveLetter(char, 'e', 78);
-        break;
-      }
-      case 78: {
-        return this.getReserve(char, 't', 'declare');
-      }
-      case 79: {
-        this.readReserveLetters(char, [
+      case 70:
+        return this.readReserveLetter(char, 't', 71);
+      case 71:
+        return this.readReserveLetter(char, 'a', 72);
+      case 72:
+        return this.readReserveLetter(char, 'n', 73);
+      case 73:
+        return this.readReserveLetter(char, 'c', 74);
+      case 74:
+        return this.readReserveLetter(char, 'e', 75);
+      case 75:
+        return this.readReserveLetter(char, 'o', 76);
+      case 76:
+        return this.readReserveLetter(char, 'f', 150);
+      case 77:
+        return this.readReserveLetter(char, 'e', 78);
+      case 78:
+        return this.readReserveLetter(char, 't', 151);
+      case 79:
+        return this.readReserveLetters(char, [
           ['e', 80],
           ['u', 81]
         ]);
-        break;
-      }
-      case 80: {
-        return this.getReserve(char, 'w', 'class');
-      }
-      case 81: {
-        this.readReserveLetter(char, 'l', 82);
-        break;
-      }
-      case 82: {
-        return this.getReserve(char, 'l', 'type');
-      }
-      case 83: {
-        this.readReserveLetter(char, 'e', 84);
-        break;
-      }
-      case 84: {
-        this.readReserveLetter(char, 't', 85);
-        break;
-      }
-      case 85: {
-        this.readReserveLetter(char, 'u', 86);
-        break;
-      }
-      case 86: {
-        this.readReserveLetter(char, 'r', 87);
-        break;
-      }
-      case 87: {
-        return this.getReserve(char, 'n', 'function');
-      }
-      case 88: {
-        this.readReserveLetters(char, [
+      case 80:
+        return this.readReserveLetter(char, 'w', 152);
+      case 81:
+        return this.readReserveLetter(char, 'l', 82);
+      case 82:
+        return this.readReserveLetter(char, 'l', 153);
+      case 83:
+        return this.readReserveLetter(char, 'e', 84);
+      case 84:
+        return this.readReserveLetter(char, 't', 85);
+      case 85:
+        return this.readReserveLetter(char, 'u', 86);
+      case 86:
+        return this.readReserveLetter(char, 'r', 87);
+      case 87:
+        return this.readReserveLetter(char, 'n', 154);
+      case 88:
+        return this.readReserveLetters(char, [
           ['u', 89],
           ['w', 92],
           ['t', 96],
         ]);
         break;
-      }
-      case 89: {
-        this.readReserveLetter(char, 'p', 90);
-        break;
-      }
-      case 90: {
-        this.readReserveLetter(char, 'e', 91);
-        break;
-      }
-      case 91: {
-        return this.getReserve(char, 'r', 'class');
-      }
-      case 92: {
-        this.readReserveLetter(char, 'i', 93);
-        break;
-      }
-      case 93: {
-        this.readReserveLetter(char, 't', 94);
-        break;
-      }
-      case 94: {
-        this.readReserveLetter(char, 'c', 95);
-        break;
-      }
-      case 95: {
-        return this.getReserve(char, 'h', 'switch');
-      }
-      case 96: {
-        this.readReserveLetter(char, 'a', 97);
-        break;
-      }
-      case 97: {
-        this.readReserveLetter(char, 't', 98);
-        break;
-      }
-      case 98: {
-        this.readReserveLetter(char, 'i', 99);
-        break;
-      }
-      case 99: {
-        return this.getReserve(char, 'c', 'class');
-      }
-      case 100: {
-        this.readReserveLetters(char, [
+      case 89:
+        return this.readReserveLetter(char, 'p', 90);
+      case 90:
+        return this.readReserveLetter(char, 'e', 91);
+      case 91:
+        return this.readReserveLetter(char, 'r', 155);
+      case 92:
+        return this.readReserveLetter(char, 'i', 93);
+      case 93:
+        return this.readReserveLetter(char, 't', 94);
+      case 94:
+        return this.readReserveLetter(char, 'c', 95);
+      case 95:
+        return this.readReserveLetter(char, 'h', 156);
+      case 96:
+        return this.readReserveLetter(char, 'a', 97);
+      case 97:
+        return this.readReserveLetter(char, 't', 98);
+      case 98:
+        return this.readReserveLetter(char, 'i', 99);
+      case 99:
+        return this.readReserveLetter(char, 'c', 157);
+      case 100:
+        return this.readReserveLetters(char, [
           ['h', 101],
           ['r', 103],
           ['y', 107],
         ]);
-        break;
-      }
-      case 101: {
-        this.readReserveLetters(char, [
+      case 101:
+        return this.readReserveLetters(char, [
           ['i', 102],
           ['r', 105],
         ]);
-        break;
-      }
-      case 102: {
-        return this.getReserve(char, 's', 'class');
-      }
-      case 103: {
-        this.readReserveLetter(char, 'o', 104);
-        break;
-      }
-      case 104: {
-        return this.getReserve(char, 'w', 'try');
-      }
-      case 105: {
-        if (char === 'u') {
+      case 102:
+        return this.readReserveLetter(char, 's', 158);
+      case 103:
+        return this.readReserveLetters(char, [
+          ['u', 105],
+          ['y', 160],
+        ]);
+      case 104:
+        return this.readReserveLetter(char, 'w', 159);
+      case 105:
+        if (char === 'e') {
           this.elems.push(char);
           this.status = 106;
-        } else if (char === 'y') {
-          this.elems.push(char);
-          this.ans.push(this.makeToken('try', this.elems.join('')));
-          return this.quit();
-        } else if (char === 'EOF') {
+        } else if (char === 'EOF' || char === ' ') {
           this.ans.push(this.makeToken('identifer', this.elems.join('')));
           return this.quit();
         } else {
@@ -851,68 +682,43 @@ class JavascriptLexer extends Lexer {
           this.status = 1;
         }
         break;
-      }
-      case 106: {
-        return this.getReserve(char, 'e', 'bool');
-      }
-      case 107: {
-        this.readReserveLetter(char, 'p', 108);
-        break;
-      }
-      case 108: {
-        this.readReserveLetter(char, 'e', 109);
-        break;
-      }
-      case 109: {
-        this.readReserveLetter(char, 'o', 110);
-        break;
-      }
-      case 110: {
-        return this.getReserve(char, 'f', 'type');
-      }
-      case 111: {
-        this.readReserveLetters(char, [
+      case 106:
+        return this.getReserve(char, ' ', 'bool');
+      case 107:
+        return this.readReserveLetter(char, 'p', 108);
+      case 108:
+        return this.readReserveLetter(char, 'e', 109);
+      case 109:
+        return this.readReserveLetter(char, 'o', 110);
+      case 110:
+        return this.readReserveLetter(char, 'f', 162);
+      case 111:
+        return this.readReserveLetters(char, [
           ['a', 112],
           ['o', 113],
         ]);
-        break;
-      }
-      case 112: {
-        return this.getReserve(char, 'r', 'declare');
-      }
-      case 113: {
-        this.readReserveLetter(char, 'i', 114);
-        break;
-      }
-      case 114: {
-        return this.getReserve(char, 'd', 'function');
-      }
-      case 115: {
-        this.readReserveLetters(char, [
+      case 112:
+        return this.readReserveLetter(char, 'r', 163);
+      case 113:
+        return this.readReserveLetter(char, 'i', 114);
+      case 114:
+        return this.readReserveLetter(char, 'd', 164);
+      case 115:
+        return this.readReserveLetters(char, [
           ['h', 116],
           ['i', 119],
         ]);
-        break;
-      }
-      case 116: {
-        this.readReserveLetter(char, 'i', 117);
-        break;
-      }
-      case 117: {
-        this.readReserveLetter(char, 'l', 118);
-        break;
-      }
-      case 118: {
-        return this.getReserve(char, 'e', 'while');
-      }
-      case 119: {
-        this.readReserveLetter(char, 't', 120);
-        break;
-      }
-      case 120: {
-        return this.getReserve(char, 'h', 'function');
-      }
-      case 121: {
+      case 116:
+        return this.readReserveLetter(char, 'i', 117);
+      case 117:
+        return this.readReserveLetter(char, 'l', 118);
+      case 118:
+        return this.readReserveLetter(char, 'e', 165);
+      case 119:
+        return this.readReserveLetter(char, 't', 120);
+      case 120:
+        return this.readReserveLetter(char, 'h', 166);
+      case 121:
         this.elems.push(char);
         if (char === '/') {
           this.status = 122;
@@ -923,16 +729,14 @@ class JavascriptLexer extends Lexer {
           return this.quit();
         }
         break;
-      }
-      case 122: {
+      case 122:
         this.elems.push(char);
         if (char === '\n') {
           this.ans.push(this.makeToken('lineComment', this.elems.join('')));
           return this.quit();
         }
         break;
-      }
-      case 123: {
+      case 123:
         this.elems.push(char);
         if (char === '*') {
           this.status = 124;
@@ -940,7 +744,6 @@ class JavascriptLexer extends Lexer {
           return this.quit();
         }
         break;
-      }
       case 124: {
         if (char === '/') {
           this.elems.push(char);
@@ -1030,7 +833,7 @@ class JavascriptLexer extends Lexer {
         }
         break;
       }
-      case 130: {
+      case 130:
         const code = char.charCodeAt(0);
         if (char === 'EOF') {
           this.ans.push(this.makeToken('decimal', this.elems.join('')));
@@ -1049,7 +852,78 @@ class JavascriptLexer extends Lexer {
           return this.quit();
         }
         break;
-      }
+      case 131:
+        return this.getReserve(char, ' ', 'function');
+      case 132:
+        return this.getReserve(char, ' ', 'async');
+      case 133:
+        return this.getReserve(char, ' ', 'for');
+      case 134:
+        return this.getReserve(char, ' ', 'switch');
+      case 135:
+        return this.getReserve(char, ' ', 'try');
+      case 136:
+        return this.getReserve(char, ' ', 'class');
+      case 137:
+        return this.getReserve(char, ' ', 'for');
+      case 138:
+        return this.getReserve(char, ' ', 'declare');
+      case 139:
+        return this.getReserve(char, ' ', 'while');
+      case 140:
+        return this.getReserve(char, ';', 'debugger');
+      case 141:
+        return this.getReserve(char, ' ', 'if');
+      case 142:
+        return this.getReserve(char, ' ', 'module');
+      case 143:
+        return this.getReserve(char, ' ', 'switch');
+      case 144:
+        return this.getReserve(char, ' ', 'class');
+      case 145:
+        return this.getReserve(char, ';', 'bool');
+      case 146:
+        return this.getReserve(char, ' ', 'for');
+      case 147:
+        return this.getReserve(char, ' ', 'declare');
+      case 148:
+        return this.getReserve(char, ' ', 'if');
+      case 149:
+        return this.getReserve(char, ' ', 'module');
+      case 150:
+        return this.getReserve(char, ' ', 'function');
+      case 151:
+        return this.getReserve(char, ' ', 'declare');
+      case 152:
+        return this.getReserve(char, ' ', 'class');
+      case 153:
+        return this.getReserve(char, ';', 'type');
+      case 154:
+        return this.getReserve(char, ' ', 'function');
+      case 155:
+        return this.getReserve(char, ' ', 'class');
+      case 156:
+        return this.getReserve(char, ' ', 'switch');
+      case 157:
+        return this.getReserve(char, ' ', 'class');
+      case 158:
+        return this.getReserve(char, '.', 'class');
+      case 159:
+        return this.getReserve(char, ' ', 'try');
+      case 160:
+        return this.getReserve(char, ' ', 'try');
+      case 161:
+        return this.getReserve(char, ';', 'bool');
+      case 162:
+        return this.getReserve(char, ' ', 'type');
+      case 163:
+        return this.getReserve(char, ' ', 'declare');
+      case 164:
+        return this.getReserve(char, ' ', 'function');
+      case 165:
+        return this.getReserve(char, ' ', 'while');
+      case 166:
+        return this.getReserve(char, ' ', 'function');
       default:
         return this.quit();
     }

@@ -1,6 +1,6 @@
 {
   "name": "glow.js",
-  "version": "0.0.28",
+  "version": "0.0.30",
   "description": "Frontend highlight project.",
   "main": "dist/index.js",
   "repository": {

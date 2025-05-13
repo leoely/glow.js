@@ -22,7 +22,7 @@ class CtfLexer extends Lexer {
           (code >= 45 && code <= 47) ||
           (code >= 123 && code <= 153)
         ) && char !== '(' && char !== ')' && char !== '[' && char !== ']' &&
-          char !== '|' && char !== '&'
+          char !== '|' && char !== '&' && char !== '*'
         ) {
           this.elems = [];
           this.elems.push(char);
@@ -58,6 +58,9 @@ class CtfLexer extends Lexer {
             return this.quit();
           case ':':
             this.ans.push(this.makeToken('colon', ':'));
+            return this.quit();
+          case '*':
+            this.ans.push(this.makeToken('asterick', '*'));
             return this.quit();
         }
         break;

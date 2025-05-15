@@ -30,7 +30,7 @@ class VersionLexer extends Lexer {
         const code = char.charCodeAt(0);
         if (code >= 48 && code <= 57) {
           this.elems.push(char);
-        } else if (char === '.' || char === 'EOF') {
+        } else if (char === '.' || char === '') {
           this.ans.push(this.makeToken('version', this.elems.join('')))
             return this.quit();
         }

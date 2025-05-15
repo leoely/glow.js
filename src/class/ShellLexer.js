@@ -15,7 +15,7 @@ class ShellLexer extends Lexer {
     if (char === letter) {
       this.elems.push(char);
       this.status = status;
-    } else if (char === 'EOF' || char === ' ' || char === ';') {
+    } else if (char === '' || char === ' ' || char === ';') {
       this.ans.push(this.makeToken('identifer', this.elems.join('')));
       return this.quit();
     } else {
@@ -36,7 +36,7 @@ class ShellLexer extends Lexer {
       }
     }
     if (flag === false) {
-      if (char === 'EOF' || char === ' ') {
+      if (char === '' || char === ' ') {
         this.ans.push(this.makeToken('identifer', this.elems.join('')));
         return this.quit();
       } else {
@@ -47,7 +47,7 @@ class ShellLexer extends Lexer {
   }
 
   getReserve(char, letter, set) {
-    if (char === letter || char === ';' || char === 'EOF' || char === '(' ||
+    if (char === letter || char === ';' || char === '' || char === '(' ||
       char === '{' || char === ':' || char === '&' || char === '|' ||
       char === ' ' || char === '.' || char === '\n'
     ) {
@@ -207,7 +207,7 @@ class ShellLexer extends Lexer {
         break;
       }
       case 2: {
-        if (char === '\n' || char === 'EOF') {
+        if (char === '\n' || char === '') {
           this.ans.push(this.makeToken('hashbangComment', this.elems.join('')));
           return this.quit();
         } else {
@@ -272,7 +272,7 @@ class ShellLexer extends Lexer {
         }
         break;
       case 8: {
-        if (char === 'EOF') {
+        if (char === '') {
           this.ans.push(this.makeToken('variable', this.elems.join('')));
           return this.quit();
         }
@@ -288,7 +288,7 @@ class ShellLexer extends Lexer {
         break;
       }
       case 9: {
-        if (char === 'EOF') {
+        if (char === '') {
           this.ans.push(this.makeToken('centerLine', '-'));
           return this.quit();
         }
@@ -303,7 +303,7 @@ class ShellLexer extends Lexer {
         break;
       }
       case 10: {
-        if (char === 'EOF') {
+        if (char === '') {
           this.ans.push(this.makeToken('option', this.elems.join('')));
           return this.quit();
         }
@@ -317,7 +317,7 @@ class ShellLexer extends Lexer {
         break;
       }
       case 11: {
-        if (char === 'EOF') {
+        if (char === '') {
           this.ans.push(this.makeToken('pathVariable', this.elems.join('')));
           return this.quit();
         }
@@ -341,7 +341,7 @@ class ShellLexer extends Lexer {
       case 16:
         return this.readReserveLetter(char, 'o', 17);
       case 17:
-        if (char === ' ' || char === '\n' || char === 'EOF') {
+        if (char === ' ' || char === '\n' || char === '') {
           this.ans.push(this.makeToken('do', this.elems.join('')));
           return this.quit();
         } else if (char === 'n') {

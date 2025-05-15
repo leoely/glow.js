@@ -58,7 +58,7 @@ class YamlLexer extends Lexer {
           this.ans.push(this.makeToken('definition', ':'));
           return this.quit();
         } else {
-          if (char === ' ' || char === '\n' || char === 'EOF') {
+          if (char === ' ' || char === '\n' || char === '') {
             this.ans.push(this.makeToken('value', this.elems.join('')));
             return this.quit();
           } else {
@@ -74,7 +74,7 @@ class YamlLexer extends Lexer {
         }
         break;
       case 3:
-        if (char === '\n' || char === 'EOF') {
+        if (char === '\n' || char === '') {
           this.ans.push(this.makeToken('comment', this.elems.join('')));
           return this.quit();
         } else {

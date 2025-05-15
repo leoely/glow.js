@@ -15,7 +15,7 @@ class JavascriptLexer extends Lexer {
     if (char === letter) {
       this.elems.push(char);
       this.status = status;
-    } else if (char === 'EOF' || char === ' ' || char === ';') {
+    } else if (char === '' || char === ' ' || char === ';') {
       this.ans.push(this.makeToken('identifer', this.elems.join('')));
       return this.quit();
     } else {
@@ -37,7 +37,7 @@ class JavascriptLexer extends Lexer {
       }
     }
     if (flag === false) {
-      if (char === 'EOF' || char === ' ') {
+      if (char === '' || char === ' ') {
         this.ans.push(this.makeToken('identifer', this.elems.join('')));
         return this.quit();
       } else {
@@ -49,7 +49,7 @@ class JavascriptLexer extends Lexer {
   }
 
   getReserve(char, letter, set) {
-    if (char === letter || char === ';' || char === 'EOF' || char === '(' ||
+    if (char === letter || char === ';' || char === '' || char === '(' ||
       char === '{' || char === ':' || char === '&' || char === '|' ||
       char === ' ' || char === '.'
     ) {
@@ -349,7 +349,7 @@ class JavascriptLexer extends Lexer {
         break;
       }
       case 1: {
-        if (char === 'EOF') {
+        if (char === '') {
           this.ans.push(this.makeToken('identifer', this.elems.join('')));
           return this.quit();
         }
@@ -554,7 +554,7 @@ class JavascriptLexer extends Lexer {
         } else if (char === 'f') {
           this.elems.push(char);
           this.status = 148;
-        } else if (char === 'EOF') {
+        } else if (char === '') {
           this.ans.push(this.makeToken('identifer', this.elems.join('')));
           return this.quit();
         } else {
@@ -673,7 +673,7 @@ class JavascriptLexer extends Lexer {
         if (char === 'e') {
           this.elems.push(char);
           this.status = 106;
-        } else if (char === 'EOF' || char === ' ') {
+        } else if (char === '' || char === ' ') {
           this.ans.push(this.makeToken('identifer', this.elems.join('')));
           return this.quit();
         } else {
@@ -765,7 +765,7 @@ class JavascriptLexer extends Lexer {
       }
       case 126: {
         const code = char.charCodeAt(0);
-        if (char === 'EOF') {
+        if (char === '') {
           this.ans.push(this.makeToken('decimal', this.elems.join('')));
           return this.quit();
         } else if (
@@ -794,7 +794,7 @@ class JavascriptLexer extends Lexer {
       }
       case 128: {
         const code = char.charCodeAt(0);
-        if (char === 'EOF') {
+        if (char === '') {
           this.ans.push(this.makeToken('decimal', this.elems.join('')));
           return this.quit();
         } else if (
@@ -815,7 +815,7 @@ class JavascriptLexer extends Lexer {
       }
       case 129: {
         const code = char.charCodeAt(0);
-        if (char === 'EOF') {
+        if (char === '') {
           this.ans.push(this.makeToken('decimal', this.elems.join('')));
           return this.quit();
         } else if (
@@ -835,7 +835,7 @@ class JavascriptLexer extends Lexer {
       }
       case 130:
         const code = char.charCodeAt(0);
-        if (char === 'EOF') {
+        if (char === '') {
           this.ans.push(this.makeToken('decimal', this.elems.join('')));
           return this.quit();
         } else if (

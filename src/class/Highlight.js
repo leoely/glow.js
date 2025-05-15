@@ -31,12 +31,7 @@ class HighLight {
     this.use += 0;
     const times = new Array(lexers.length).fill(0);
     for (let i = 0; i <= text.length; i += 1) {
-      let char;
-      if (i === text.length) {
-        char = 'EOF';
-      } else {
-        char = text.charAt(i);
-      }
+      let char = text.charAt(i);
       this.ins.forEach((l) => {
         if (l !== undefined) {
           if (l.scan(char) === false) {

@@ -6,104 +6,89 @@ class YamlLexer extends Lexer {
   }
 
   scan(char) {
-    switch (this.status) {
-      case 0: {
-        if (char === ' ') {
-          return this.quit();
-        }
-        const code = char.charCodeAt(0);
-        if ((
-          (code >= 97 && code <= 122) ||
-          (code >= 65 && code <= 90) ||
-          (code >= 59 && code <= 64) ||
-          (code >= 33 && code <= 47) ||
-          (code >= 123 && code <= 153)
-        ) && char !== '"' && char !== '-' && char !== '(' && char !== ')'
-        ) {
-          this.elems = [];
-          this.elems.push(char);
-          this.status = 1;
-          return;
-        }
-        if (code >= 48 && code <= 57) {
-          this.elems = [];
-          this.elems.push(char);
-          this.status = 5;
-          return;
-        }
+    const { status, } = this;
+    switch (status) {
+      case 0:
         switch (char) {
+          case ')':
+          case '\n':
+          case ' ':
+            break;
           case '"':
-            this.ans.push(this.makeToken('string', '"'));
-            this.elems = [];
-            this.status = 2;
+            this.prepareCharsAndJump(char, 2);
+            break;
+          case '(':
+            this.prepareCharsAndJump(char, 3);
             break;
           case '-':
-            this.ans.push(this.makeToken('list', '-'));
-            return this.quit();
-          case '.':
-            this.ans.push(this.makeToken('symbol', '.'));
-            return this.quit();
-          case '(':
-            this.elems = [];
+            this.chars = [];
+            this.appendToken(char, 'dash');
             this.status = 4;
             break;
+          case ':':
+            return this.createToken('colon', ':');
           default:
-            return this.quit();
+            this.prepareCharsAndJump(char, 1);
         }
         break;
-      }
       case 1:
-        if (char === ':') {
-          this.ans.push(this.makeToken('key', this.elems.join('')));
-          this.ans.push(this.makeToken('definition', ':'));
-          return this.quit();
-        } else {
-          if (char === ' ' || char === '\n' || char === '') {
-            this.ans.push(this.makeToken('value', this.elems.join('')));
+        switch (char) {
+          case ':':
+            this.appendTokenChars('key');
+            this.appendToken(char, 'colon');
+            this.status = 0;
+            break;
+          case '':
+          case '\n':
+            this.appendTokenChars('value');
+            break;
+          case '(':
+            this.appendTokenChars('value');
+            this.prepareChars(char);
+            this.status = 3;
+            break;
+          case ' ':
             return this.quit();
-          } else {
-            this.elems.push(char);
-          }
+          default:
+            this.chars.push(char);
         }
         break;
       case 2:
-        if (char === ' ') {
-          this.status = 3;
-        } else {
-          return this.quit();
+        switch (char) {
+          case ' ':
+            this.appendTokenChars('notes');
+            break;
+          case '\n':
+            this.appendTokenCharsAndJump('notes', 0);
+            break;
+          case '':
+            return this.createTokenChars('notes');
+          default:
+            this.chars.push(char);
         }
         break;
       case 3:
-        if (char === '\n' || char === '') {
-          this.ans.push(this.makeToken('comment', this.elems.join('')));
-          return this.quit();
-        } else {
-          this.elems.push(char);
+        switch (char) {
+          case ')':
+            this.chars.push(char);
+            return this.createTokenChars('unit');
+          default:
+            this.chars.push(char);
         }
         break;
-      case 4: {
-        if (char === ')') {
-          this.ans.push(this.makeToken('('));
-          this.ans.push(this.makeToken('unit', this.elems.join('')));
-          this.ans.push(this.makeToken(')'));
-          return this.quit();
-        } else {
-          this.elems.push(char);
+      case 4:
+        switch (char) {
+          case ' ':
+            break;
+          case '':
+          case '\n':
+            this.appendTokenChars('value');
+            this.status = 0;
+            break;
+          default:
+            this.chars.push(char);
         }
         break;
-      }
-      case 5: {
-        const code = char.charCodeAt(0);
-        if (code >= 48 && code <= 57) {
-          this.elems.push(char);
-        } else {
-          this.ans.push(this.makeToken('number', this.elems.join('')));
-          return this.quit();
-        }
-        break;
-      }
-      default:
-        return this.quit();
     }
   }
 }

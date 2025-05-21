@@ -6,34 +6,39 @@ class VersionLexer extends Lexer {
   }
 
   scan(char) {
-    switch (this.status) {
-      case 0: {
+    const { status, } = this;
+    switch (status) {
+      case 0:
         switch (char) {
           case '.':
-            this.ans.push(this.makeToken('symbol', '.'));
-            return this.quit();
+            this.appendToken(char, 'dot');
             break;
           case 'v':
-            this.ans.push(this.makeToken('symbol', 'v'));
-            return this.quit();
+            this.appendToken(char, 'head');
             break;
-        }
-        const code = char.charCodeAt(0);
-        if (code >= 48 && code <= 57) {
-          this.elems = [];
-          this.elems.push(char);
-          this.status = 1;
+          default:
+            if (char >= '0' && char <= '9') {
+              this.prepareCharsAndJump(char, 1);
+            }
         }
         break;
-      }
       case 1: {
-        const code = char.charCodeAt(0);
-        if (code >= 48 && code <= 57) {
-          this.elems.push(char);
-        } else if (char === '.' || char === '') {
-          this.ans.push(this.makeToken('version', this.elems.join('')))
-            return this.quit();
+        if (char >= '0' && char <= '9') {
+          this.chars.push(char);
+        } else {
+          switch (char) {
+            case '.':
+              this.appendTokenChars('version');
+              this.appendToken(char, 'dot');
+              break;
+            case '':
+              this.appendTokenChars('version');
+              break;
+            default:
+              return this.quit();
+          }
         }
+        break;
       }
     }
   }

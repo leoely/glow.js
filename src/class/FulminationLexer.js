@@ -6,60 +6,182 @@ class FulminationLexer extends Lexer {
   }
 
   scan(char) {
-    switch (this.status) {
-      case 0:
-        if (char !== '(' && char !== ')' && char !== '[' && char !== ']'
-          && char !== ';' && char !== ':' && char !== '&' && char !== '*'
-          && char !== '+' && char !== '|'
-        ) {
-          this.elems = [];
-          this.elems.push(char);
-          this.status = 1;
-          return;
+    const lastToken = this.getReciprocalToken(1);
+    if (lastToken !== undefined) {
+      const { type, } = lastToken;
+      switch (type) {
+        case ' ': {
+          const { step, } = FulminationLexer;
+          if (step > 1) {
+            this.status = 4;
+            break;
+          }
+          const { goon, } = FulminationLexer;
+          if (goon === true) {
+            this.status = 5;
+            break;
+          }
+          break;
         }
+        case 'escape': {
+          const { elem, } = lastToken;
+          const { length, } = elem;
+          if (elem.charAt(length - 1) === char && char !== '"') {
+            return;
+          }
+          break;
+        }
+      }
+    }
+    const { status, } = this;
+    switch (status) {
+      case 0: {
         switch (char) {
           case '&':
-            this.ans.push(this.makeToken('and', '&'));
-            return this.quit();
+            return this.createToken('and', char);
           case '+':
-            this.ans.push(this.makeToken('plus', '+'));
-            return this.quit();
+            return this.createToken('plus', char);
           case '(':
-            this.ans.push(this.makeToken('parenthese', '('));
-            return this.quit();
+            return this.createToken('parenthese', char);
           case ')':
-            this.ans.push(this.makeToken('parenthese', ')'));
-            return this.quit();
+            return this.createToken('parenthese', char);
           case '[':
-            this.ans.push(this.makeToken('squareParenthese', '['));
-            return this.quit();
+            return this.createToken('squareParenthese', char);
           case ']':
-            this.ans.push(this.makeToken('squareParenthese', ']'));
-            return this.quit();
+            return this.createToken('squareParenthese', char);
           case ';':
-            this.ans.push(this.makeToken('semicolon', ';'));
-            return this.quit();
+            return this.createToken('semicolon', char);
           case ':':
-            this.ans.push(this.makeToken('colon', ':'));
-            return this.quit();
+            return this.createToken('colon', char);
           case '*':
-            this.ans.push(this.makeToken('asterick', '*'));
-            return this.quit();
+            return this.createToken('asterisk', char);
           case '|':
-            this.ans.push(this.makeToken('line', '|'));
-            return this.quit();
+            return this.createToken('line', char);
+          case '"':
+            this.prepareCharsAndJump(char, 2);
+            break;
+          case '\n':
+            break;
+          default:
+            this.prepareCharsAndJump(char, 1);
         }
         break;
+      }
       case 1:
-        if (char === ';' || char === ':') {
-          this.ans.push(this.makeToken('format', this.elems.join('')));
-          return this.quit();
+        switch (char) {
+          case ';':
+            this.appendTokenChars('format');
+            this.appendToken(char, 'semicolon');
+            this.status = 0;
+            break;
+          case ':':
+            this.appendTokenChars('format');
+            this.appendToken(char, 'colon');
+            this.status = 0;
+            break;
+          case '(':
+          case '[':
+          case '|':
+          case '*':
+          case '"':
+          case '&':
+          case ' ':
+          case '':
+          case '\n':
+            return this.createTokenChars('text');
+          case '"':
+            break;
+          default:
+            this.chars.push(char);
         }
-        if (char === '(' || char === '[' || char === '|' || char === ' ' || char === '' || char === '\n') {
-          this.ans.push(this.makeToken('text', this.elems.join('')));
-          return this.quit();
+        break;
+      case 2:
+        switch (char) {
+          case '(':
+          case ')':
+          case '[':
+          case ']':
+          case '+':
+          case ':':
+          case ';':
+          case '&':
+          case '"':
+          case '*':
+            this.chars.push(char);
+            this.appendTokenChars('escape');
+            this.status = 0;
+            break;
+          default:
+            if (char >= '0' && char <= '9') {
+              this.ints = [char];
+              this.chars.push(char);
+              this.status = 3;
+            } else if (char === 'b') {
+              FulminationLexer.goon = true;
+              FulminationLexer.head = true;
+              this.chars.push(char);
+              this.status = 5;
+            }
         }
-        this.elems.push(char);
+        break;
+      case 3:
+        if (char >= '0' && char <= '9') {
+          this.ints.push(char);
+          this.chars.push(char);
+        } else {
+          FulminationLexer.step = parseInt(this.ints.join(''));
+          FulminationLexer.head = true;
+          return this.createTokenChars('escape');
+        }
+        break;
+      case 4: {
+        switch (char) {
+          case ' ': {
+            const { head, } = FulminationLexer;
+            if (head === false) {
+              FulminationLexer.step -= 1;
+            } else {
+            }
+            return this.createTokenChars('escape');
+          }
+          default: {
+            const { step, } = FulminationLexer;
+            if (step === 1) {
+              this.chars.push(char);
+              delete FulminationLexer.step;
+              delete FulminationLexer.head;
+              return this.createTokenChars('escape');
+            } else {
+              FulminationLexer.step -= 1;
+              const { chars, } = this;
+              if (!Array.isArray(chars)) {
+                this.chars = [];
+              }
+              this.chars.push(char);
+              FulminationLexer.head = false;
+            }
+          }
+        }
+        break;
+      }
+      case 5:
+        switch (char) {
+          case '"':
+            delete FulminationLexer.goon;
+            delete FulminationLexer.head;
+            this.chars.push(char);
+            return this.createTokenChars('escape');
+          case ' ':
+            return this.createTokenChars('escape');
+          default: {
+            const { chars, } = this;
+            if (!Array.isArray(chars)) {
+              this.chars = [];
+            }
+            this.chars.push(char);
+            FulminationLexer.head = false;
+          }
+        }
         break;
     }
   }

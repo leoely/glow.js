@@ -29,8 +29,9 @@ class HighLight {
     const ans = [];
     this.ins = [];
     this.use += 0;
+    this.open = true;
     const times = new Array(lexers.length).fill(0);
-    for (let i = 0; i <= text.length; i += 1) {
+    outer: for (let i = 0; i <= text.length; i += 1) {
       let char = text.charAt(i);
       this.ins.forEach((l) => {
         if (l !== undefined) {
@@ -40,18 +41,23 @@ class HighLight {
           }
         }
       });
-      if ((char === ' ' || char === '\n')) {
-        ans.push({ type: char, });
-        continue;
+      switch (char) {
+        case ' ':
+        case '\n':
+          ans.push({ type: char, });
+          this.open = true;
+          continue outer;
       }
+      const { open, } = this;
       for (let j = 0; j < times.length; j += 1) {
-        if (times.every(t => t <= 0)) {
+        if (open === true && times[j] <= 0) {
           const l = new lexers[j](this, ans, j);
           if (l.scan(char) === undefined) {
             l.setIndex(this.ins.length);
             this.ins.push(l);
             this.use += 1;
             times[j] += 1;
+            this.open = false;
           }
         }
       }

@@ -3,333 +3,255 @@ import Lexer from '~/class/Lexer';
 class ShellLexer extends Lexer {
   constructor(...params) {
     super(...params);
-    this.replace = 'command';
   }
 
   checkTokenDuplicate(elem) {
-    const { length, } = this.ans;
-    return this.ans[length - 1].elem === elem;
+    const { ans, } = this;
+    const { length, } = ans;
+    return ans[length - 1].elem === elem;
   }
 
   readReserveLetter(char, letter, status) {
-    if (char === letter) {
-      this.elems.push(char);
-      this.status = status;
-    } else if (char === '' || char === ' ' || char === ';') {
-      this.ans.push(this.makeToken('identifer', this.elems.join('')));
-      return this.quit();
-    } else {
-      this.elems.push(char);
-      this.status = 3;
+    switch (char) {
+      case letter:
+        this.chars.push(char);
+        this.status = status;
+        break;
+      case '':
+      case ' ':
+      case ';':
+        return this.createTokenChars('identifer');
+      default:
+        this.chars.push(char);
+        this.status = 3;
     }
   }
 
-  readReserveLetters(char, list) {
+  readReserveLetters(char, array) {
     let flag = false;
-    for (let i = 0; i < list.length; i += 1) {
-      const [letter, status] = list[i];
+    for (let i = 0; i < array.length; i += 1) {
+      const [letter, status] = array[i];
       if (char === letter) {
-        this.elems.push(char);
+        this.chars.push(char);
         this.status = status;
         flag = true;
         break;
       }
     }
     if (flag === false) {
-      if (char === '' || char === ' ') {
-        this.ans.push(this.makeToken('identifer', this.elems.join('')));
-        return this.quit();
-      } else {
-        this.elems.push(char);
-        this.status = 3;
+      switch (char) {
+        case '':
+        case ' ':
+          return this.createTokenChars('identifer');
+        default:
+          this.chars.push(char);
+          this.status = 3;
       }
     }
   }
 
   getReserve(char, letter, set) {
-    if (char === letter || char === ';' || char === '' || char === '(' ||
-      char === '{' || char === ':' || char === '&' || char === '|' ||
-      char === ' ' || char === '.' || char === '\n'
-    ) {
-      this.ans.push(this.makeToken(set, this.elems.join('')));
-      this.elems = [];
-      return this.quit();
-    } else {
-      this.identifer = true;
-      this.status = 3;
-      this.elems.push(char);
+    switch (char) {
+      case letter:
+      case ';':
+      case '':
+      case '(':
+      case '{':
+      case ':':
+      case '&':
+      case '|':
+      case ' ':
+      case '.':
+      case '\n':
+        return this.createTokenChars(set);
+      default:
+        this.identifer = true;
+        this.status = 3;
+        this.chars.push(char);
     }
   }
 
   scan(char) {
-    switch (this.status) {
+    const { status, } = this;
+    switch (status) {
       case 0:
         switch (char) {
           case '|':
-            this.ans.push(this.makeToken('or', '|'));
-            return this.quit();
+            return this.createToken('or', '|');
           case '&':
-            this.ans.push(this.makeToken('and', '&'));
-            return this.quit();
+            return this.createToken('and', '&');
           case '(':
-            this.ans.push(this.makeToken('bracket', '('));
-            return this.quit();
+            return this.createToken('bracket', '(');
           case ')':
-            this.ans.push(this.makeToken('bracket', ')'));
-            return this.quit();
+            return this.createToken('bracket', ')');
           case '<':
-            this.ans.push(this.makeToken('angleBracket', '<'));
-            return this.quit();
+            return this.createToken('angleBracket', '<');
           case '>':
-            this.ans.push(this.makeToken('angleBracket', '>'));
-            return this.quit();
+            return this.createToken('angleBracket', '>');
           case '{':
-            this.ans.push(this.makeToken('bigBracket', '{'));
-            return this.quit();
+            return this.createToken('bigBracket', '{');
           case '}':
-            this.ans.push(this.makeToken('bigBracket', '}'));
-            return this.quit();
+            return this.createToken('bigBracket', '}');
           case '*':
-            this.ans.push(this.makeToken('asterisk', '*'));
-            return this.quit();
+            return this.createToken('asterisk', '*');
           case '!':
-            this.ans.push(this.makeToken('exclamation', '!'));
-            return this.quit();
+            return this.createToken('exclamation', '!');
           case '?':
-            this.ans.push(this.makeToken('questionMark', '?'));
-            return this.quit();
+            return this.createToken('questionMark', '?');
           case '@':
-            this.ans.push(this.makeToken('questionMark', '?'));
-            return this.quit();
+            return this.createToken('at', '@');
           case ':':
-            this.elems = [];
-            this.elems.push(char);
-            this.status = 12;
-            return;
+            this.prepareCharsAndJump(char, 12);
+            break;
           case '-':
-            this.elems = [];
-            this.elems.push(char);
-            this.status = 9;
-            return;
+            this.prepareCharsAndJump(char, 9);
+            break;
           case '#':
-            this.elems = [];
-            this.elems.push(char);
-            this.status = 1;
-            return;
+            this.prepareCharsAndJump(char, 1);
+            break;
+          case "`":
+            this.prepareCharsAndJump(char, 7);
+            break;
+          case '$':
+            this.prepareCharsAndJump(char, 8);
+            break;
           case '"':
             if (!this.checkTokenDuplicate('"')) {
-              this.ans.push(this.makeToken('singleQuote', '"'));
-              this.elems = [];
-              this.status = 5;
-              return;
+              this.appendToken(char, 'doubleQuote');
+              this.prepareEmptyCharsAndJump(5);
             } else {
               return this.quit();
             }
+            break;
           case "'":
             if (!this.checkTokenDuplicate('"')) {
-              this.ans.push(this.makeToken('doubleQuote', '"'));
-              this.elems = [];
-              this.status = 6;
-              return;
+              this.appendToken(char, 'singleQuote');
+              this.prepareEmptyCharsAndJump(6);
             } else {
               return this.quit();
             }
-          case "`":
-            this.elems = [];
-            this.elems.push(char);
-            this.status = 7;
-            return;
-          case '$':
-            this.elems = [];
-            this.elems.push(char);
-            this.status = 8;
-            return;
-        }
-        switch (char) {
+            break;
           case 'c':
-            this.elems = [];
-            this.elems.push(char);
-            this.status = 12;
-            return;
+            this.prepareCharsAndJump(char, 12);
+            break;
           case 'd':
-            this.elems = [];
-            this.elems.push(char);
-            this.status = 16;
-            return;
+            this.prepareCharsAndJump(char, 16);
+            break;
           case 'e':
-            this.elems = [];
-            this.elems.push(char);
-            this.status = 20;
-            return;
+            this.prepareCharsAndJump(char, 20);
+            break;
           case 'f':
-            this.elems = [];
-            this.elems.push(char);
-            this.status = 29;
-            return;
+            this.prepareCharsAndJump(char, 29);
+            break;
           case 'i':
-            this.elems = [];
-            this.elems.push(char);
-            this.status = 33;
-            return;
+            this.prepareCharsAndJump(char, 33);
+            break;
           case 't':
-            this.elems = [];
-            this.elems.push(char);
-            this.status = 36;
-            return;
+            this.prepareCharsAndJump(char, 36);
+            break;
           case 'u':
-            this.elems = [];
-            this.elems.push(char);
-            this.status = 40;
-            return;
+            this.prepareCharsAndJump(char, 40);
+            break;
           case 'w':
-            this.elems = [];
-            this.elems.push(char);
-            this.status = 45;
-            return;
-        }
-        const code = char.charCodeAt(0);
-        if ((code >= 97 && code <= 122) ||
-          (code >= 59 && code <= 64) || (code >= 33 && code <= 42) ||
-          (code >= 48 && code <= 57) || (code >= 123 && code <= 153)) {
-          this.elems = [];
-          this.elems.push(char);
-          this.status = 3;
-          return;
+            this.prepareCharsAndJump(char, 45);
+            break;
+          default:
+            this.prepareCharsAndJump(char, 3);
         }
         break;
-      case 1: {
-        if (char === '!') {
-          this.elems.push(char);
-          this.status = 2;
-        } else {
-          return this.quit();
+      case 1:
+        switch (char) {
+          case '!':
+            this.chars.push(char);
+            this.status = 2;
+            break;
+          default:
+            return this.quit();
         }
         break;
-      }
       case 2: {
-        if (char === '\n' || char === '') {
-          this.ans.push(this.makeToken('hashbangComment', this.elems.join('')));
-          return this.quit();
-        } else {
-          this.elems.push(char);
+        switch (char) {
+          case '\n':
+          case '':
+            return this.createTokenChars('hashbangComment');
+          default:
+            this.chars.push(char);
         }
         break;
       }
-      case 3: {
-        const code = char.charCodeAt(0);
-        if ((code >= 97 && code <= 122) ||
-          (code >= 59 && code <= 64) || (code >= 33 && code <= 42) ||
-          (code >= 48 && code <= 57) || (code >= 123 && code <= 153)) {
-          this.elems.push(char);
-        } else if (char === '.') {
-          this.ans.push(this.makeToken('filename', this.elems.join('')));
-          this.ans.push(this.makeToken('dot', '.'));
-          this.elems = [];
-          this.status = 4;
-          return;
-        } else {
-          this.ans.push(this.makeToken('command', this.elems.join('')));
-          return this.quit();
+      case 3:
+        switch (char) {
+          case '':
+          case ' ':
+          case '\n':
+            return this.createTokenChars('command');
+          default:
+            if (/^[a-zA-Z0-9\.\-]$/.test(char)) {
+              this.chars.push(char);
+            } else {
+              return this.quit();
+            }
         }
         break;
-      }
-      case 4: {
-        const code = char.charCodeAt(0);
-        if ((code >= 97 && code <= 122) ||
-          (code >= 59 && code <= 64) || (code >= 33 && code <= 42) ||
-          (code >= 48 && code <= 57) || (code >= 123 && code <= 153)) {
-          this.elems.push(char);
-        } else {
-          this.ans.push(this.makeToken('suffix', this.elems.join('')));
-          return this.quit();
-        }
+      case 4:
         break;
-      }
       case 5:
-        if (char === '"') {
-          this.ans.push(this.makeToken('string', this.elems.join('')));
-          this.ans.push(this.makeToken('doubleQuote', '"'));
-          return this.quit();
-        } else {
-          this.elems.push(char);
+        switch (char) {
+          case '"':
+            this.appendTokenChars('string');
+            this.appendToken(char, 'doubleQuote');
+            return this.quit();
+          default:
+            this.chars.push(char);
         }
         break;
       case 6:
-        if (char === "'") {
-          this.ans.push(this.makeToken('string', this.elems.join('')));
-          this.ans.push(this.makeToken('singleQuote', "'"));
-          return this.quit();
-        } else {
-          this.elems.push(char);
+        switch (char) {
+          case "'":
+            this.appendTokenChars('string');
+            this.appendToken(char, 'singleQuote');
+            return this.quit();
+          default:
+          this.chars.push(char);
         }
         break;
       case 7:
-        if (char === '`') {
-          this.ans.push(this.makeToken('string', this.elems.join('')));
-          return this.quit();
-        } else {
-          this.elems.push(char);
+        switch (char) {
+          case '`':
+            this.createTokenChars('string');
+          default:
+            this.chars.push(char);
         }
         break;
-      case 8: {
-        if (char === '') {
-          this.ans.push(this.makeToken('variable', this.elems.join('')));
-          return this.quit();
-        }
-        const code = char.charCodeAt(0);
-        if ((code >= 97 && code <= 122) ||
-          (code >= 65 && code <= 95) || (code >= 33 && code <= 42) ||
-          (code >= 48 && code <= 57) || (code >= 123 && code <= 153)) {
-          this.elems.push(char);
+      case 8:
+        if (/^[a-zA-Z]$/.test(char)) {
+          this.chars.push(char);
         } else {
-          this.ans.push(this.makeToken('variable', this.elems.join('')));
-          return this.quit();
+          return this.createTokenChars('variable');
         }
         break;
-      }
-      case 9: {
-        if (char === '') {
-          this.ans.push(this.makeToken('centerLine', '-'));
-          return this.quit();
-        }
-        const code = char.charCodeAt(0);
-        if ((code >= 97 && code <= 122) || (code >= 65 && code <= 95)) {
-          this.elems.push(char);
+      case 9:
+        if (/^[a-zA-Z]$/.test(char)) {
+          this.chars.push(char);
           this.status = 10;
         } else {
-          this.ans.push(this.makeToken('centerLine', '-'));
-          return this.quit();
+          return this.createToken('centerLine', '-');
         }
         break;
-      }
-      case 10: {
-        if (char === '') {
-          this.ans.push(this.makeToken('option', this.elems.join('')));
-          return this.quit();
-        }
-        const code = char.charCodeAt(0);
-        if ((code >= 97 && code <= 122) || (code >= 65 && code <= 95)) {
-          this.elems.push(char);
+      case 10:
+        if (/^[a-zA-Z]$/.test(char)) {
+          this.chars.push(char);
         } else {
-          this.ans.push(this.makeToken('option', this.elems.join('')));
-          return this.quit();
+          return this.createTokenChars('option');
         }
         break;
-      }
-      case 11: {
-        if (char === '') {
-          this.ans.push(this.makeToken('pathVariable', this.elems.join('')));
-          return this.quit();
-        }
-        const code = char.charCodeAt(0);
-        if ((code >= 97 && code <= 122) || (code >= 65 && code <= 95)) {
-          this.elems.push(char);
+      case 11:
+        if (/^[a-zA-Z]$/.test(char)) {
+          this.chars.push(char);
         } else {
-          this.ans.push(this.makeToken('pathVariable', this.elems.join('')));
-          return this.quit();
+          this.createTokenChars('pathVariable');
         }
         break;
-      }
       case 12:
         return this.readReserveLetter(char, 'a', 13);
       case 13:
@@ -341,15 +263,18 @@ class ShellLexer extends Lexer {
       case 16:
         return this.readReserveLetter(char, 'o', 17);
       case 17:
-        if (char === ' ' || char === '\n' || char === '') {
-          this.ans.push(this.makeToken('do', this.elems.join('')));
-          return this.quit();
-        } else if (char === 'n') {
-          this.elems.push(char);
-          this.status = 18;
-        } else {
-          this.elems.push(char);
-          this.status = 3;
+        switch (char) {
+          case ' ':
+          case '\n':
+          case '':
+            return this.createTokenChars('do');
+          case 'n':
+            this.chars.push(char);
+            this.status = 18;
+            break;
+          default:
+            this.chars.push(char);
+            this.status = 3;
         }
         break;
       case 18:
@@ -428,8 +353,6 @@ class ShellLexer extends Lexer {
         return this.readReserveLetter(char, 'e', 49);
       case 49:
         return this.getReserve(char, '\n', 'while');
-      default:
-        return this.quit();
     }
   }
 }

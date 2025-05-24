@@ -11,6 +11,9 @@ class Lexer {
   }
 
   makeToken(type, elem) {
+    if (typeof type !== 'string') {
+      throw new Error('[Error] The parameter type should be string.');
+    }
     let ans;
     if (elem !== undefined) {
       ans = { type, elem, };
@@ -28,6 +31,9 @@ class Lexer {
   }
 
   getReciprocalToken(num) {
+    if (!Number.isInteger(num)) {
+      throw new Error('[Error] The parameter num should bd a integer type.');
+    }
     const { ans, } = this;
     const { length, } = ans;
     return ans[length - num];
@@ -72,6 +78,24 @@ class Lexer {
     return this.quit();
   }
 
+  removeToken() {
+    const { ans, } = this;
+    const { length, } = ans;
+    if (length === 0) {
+      throw new Error('[Error] The result set length is empty and cannot be removed.');
+    }
+    ans.pop();
+  }
+
+  removeTokens(int) {
+    if (!Number.isInteger(int)) {
+      throw new Error('[Error] The parameter num should be of integer type');
+    }
+    for (let i = 1; i <= int; i += 1) {
+      this.removeToken();
+    }
+  }
+
   createTokens(array) {
     if (Array.isArray(array)) {
       const { ans, } = this;
@@ -90,22 +114,25 @@ class Lexer {
     }
     const { chars, } = this;
     const string = chars.join('');
-    if (string !== ' ') {
+    switch (string) {
+      case '':
+      case ' ':
+      case '\n':
+        return this.quit();
+      default:
       return this.createToken(type, string);
-    } else {
-      return this.quit();
     }
   }
 
-  appendToken(char, type) {
-    if (!(typeof char === 'string' && char.length === 1)) {
-      throw new Error('[Error] Append token parameter char should be character type.');
-    }
+  appendToken(type, elem) {
     if (typeof type !== 'string') {
       throw new Error('[Error] Append token parameter type should be string type.');
     }
+    if (typeof elem !== 'string') {
+      throw new Error('[Error] Append token parameter elem should be character type.');
+    }
     const { ans, } = this;
-    ans.push(this.makeToken(type, char));
+    ans.push(this.makeToken(type, elem));
   }
 
   appendTokenChars(type) {
@@ -113,15 +140,23 @@ class Lexer {
       throw new Error('[Error] Append token chars parameter type should be string type.');
     }
     const { ans, chars, } = this;
-    ans.push(this.makeToken(type, chars.join('')));
+    const string = chars.join('');
+    switch (string) {
+      case '':
+      case ' ':
+      case '\n':
+        break;
+      default:
+        ans.push(this.makeToken(type, chars.join('')));
+    }
     this.chars = [];
   }
 
-  appendTokenAndJump(char, type, status) {
+  appendTokenAndJump(type, char, status) {
     if (typeof status !== 'number') {
       throw new Error('[Error] append to token and jump parameters status should be numberic type');
     }
-    this.appendToken(char, type);
+    this.appendToken(type, char);
     this.status = status;
   }
 

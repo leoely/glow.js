@@ -11,10 +11,10 @@ class VersionLexer extends Lexer {
       case 0:
         switch (char) {
           case '.':
-            this.appendToken(char, 'dot');
+            this.appendToken('dot', char);
             break;
           case 'v':
-            this.appendToken(char, 'head');
+            this.appendToken('head', char);
             break;
           default:
             if (char >= '0' && char <= '9') {
@@ -29,7 +29,7 @@ class VersionLexer extends Lexer {
           switch (char) {
             case '.':
               this.appendTokenChars('version');
-              this.appendToken(char, 'dot');
+              this.appendToken('dot', char);
               break;
             case '':
               this.appendTokenChars('version');

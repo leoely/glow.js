@@ -5,17 +5,45 @@ class LocationLexer extends Lexer {
     super(...param);
   }
 
+  dealFile() {
+    const { chars, } = this;
+    const filenameChars = [];
+    const { length, } = chars;
+    outer: for (let i = 0; i < length; i += 1) {
+      const char = chars.shift();
+      switch (char) {
+        case '.':
+          this.filename = true;
+          break outer;
+        default:
+          filenameChars.push(char);
+      }
+    }
+    const { filename, } = this;
+    if (filename === true) {
+      this.appendToken('filename', filenameChars.join(''));
+      this.appendToken('dot', '.');
+      return this.createTokenChars('format');
+    } else {
+      return this.createToken('namespace', filenameChars.join(''));
+    }
+  }
+
   scan(char) {
     const { status, } = this;
     switch (status) {
       case 0:
         switch (char) {
+          case ' ':
+          case '\n':
+          case '':
+            return this.quit();
           case '.':
-            this.appendToken(char, 'dot');
+            this.appendToken('dot', char);
             this.status = 1;
             break;
           case '/':
-            this.appendToken(char, 'slash');
+            this.appendToken('slash', char);
             this.prepareEmptyCharsAndJump(3);
             break;
           default:
@@ -25,24 +53,28 @@ class LocationLexer extends Lexer {
       case 1:
         switch (char) {
           case '/':
-            this.appendToken(char, 'slash');
+            this.appendToken('slash', char);
             this.status = 2;
             break;
           case '.':
-            this.appendToken(char, 'dot');
+            this.appendToken('dot', char);
             break;
           default:
-            return this.quit();
+            this.removeToken();
+            this.chars = [];
+            this.chars.push('.');
+            this.chars.push(char);
+            this.status = 11;
         }
         break;
       case 2:
         switch (char) {
           case '.':
-            this.appendToken(char, 'dot');
+            this.appendToken('dot', char);
             this.status = 1;
             break;
           case '/':
-            this.appendToken(char, 'slash');
+            this.appendToken('slash', char);
             break;
           default:
             this.prepareCharsAndJump(char, 3);
@@ -52,18 +84,21 @@ class LocationLexer extends Lexer {
         switch (char) {
           case '.':
             if (this.chars.length === 0) {
-              this.appendToken(char, 'dot');
+              this.appendToken('dot', char);
               this.status = 1;
             } else {
               this.chars.push(char);
             }
             break;
+            return  this.createTokenChars('namespace');
           case '/':
             this.appendTokenChars('namespace');
-            this.appendToken(char, 'slash');
+            this.appendToken('slash', char);
             break;
           case '':
-            return this.createTokenChars('namespace');
+          case ' ':
+          case '\n':
+            return this.dealFile();
           default:
             this.chars.push(char);
         }
@@ -72,20 +107,28 @@ class LocationLexer extends Lexer {
         switch(char) {
           case ':':
             this.appendTokenChars('protocol');
-            this.appendTokenAndJump(char, 'colon', 5);
+            this.appendTokenAndJump('colon', char, 5);
+            break;
+          case '':
+            this.dealFile();
             break;
           case ' ':
             return this.quit();
           default:
-            this.chars.push(char);
+            if (/^[a-zA-Z0-9\-\.]$/.test(char)) {
+              this.chars.push(char);
+            } else {
+              return this.quit();
+            }
         }
         break
       case 5:
         switch (char) {
           case '/':
-            this.appendTokenAndJump(char, 'slash', 6);
+            this.appendTokenAndJump('slash', char, 6);
             break;
           default:
+            this.removeTokens(2);
             return this.quit();
         }
         break;
@@ -93,9 +136,10 @@ class LocationLexer extends Lexer {
         switch (char) {
           case '/':
             this.chars = [];
-            this.appendTokenAndJump(char, 'slash', 7);
+            this.appendTokenAndJump('slash', char, 7);
             break;
           default:
+            this.removeTokens(2);
             return this.quit();
         }
         break;
@@ -103,11 +147,11 @@ class LocationLexer extends Lexer {
         switch (char) {
           case '/':
             this.appendTokenChars('namespace');
-            this.appendTokenAndJump(char, 'slash', 8);
+            this.appendTokenAndJump('slash', char, 8);
             break;
           case ':':
             this.appendTokenChars('host');
-            this.appendTokenAndJump(char, 'colon', 8);
+            this.appendTokenAndJump('colon', char, 8);
             this.chars = [];
             break;
           default:
@@ -118,7 +162,7 @@ class LocationLexer extends Lexer {
         switch (char) {
           case '/':
             this.appendTokenChars('port');
-            this.appendTokenAndJump(char, 'slash', 9);
+            this.appendTokenAndJump('slash', char, 9);
             break;
           default:
             this.chars.push(char);
@@ -127,7 +171,7 @@ class LocationLexer extends Lexer {
       case 9:
         switch (char) {
           case '/':
-            this.appendTokenAndJump(char, 'slash', 10);
+            this.appendTokenAndJump('slash', char, 10);
             break;
           default:
             this.prepareChars(char);
@@ -138,13 +182,31 @@ class LocationLexer extends Lexer {
         switch (char) {
           case '/':
             this.appendTokenChars('namespace');
-            this.appendTokenAndJump(char, 'slash', 9);
+            this.appendTokenAndJump('slash', char, 9);
             break;
           case '':
           case ' ':
-            return this.createTokenChars('namespace');
+            this.dealFile();
           default:
             this.chars.push(char);
+        }
+        break;
+      case 11:
+        switch (char) {
+          case '/':
+            this.appendTokenChars('hiddenDirectory');
+            this.appendTokenAndJump('slash', char, 3);
+            break;
+          case ' ':
+          case '\n':
+          case '':
+            return this.createTokenChars('hiddenDirectory');
+          default:
+            if (/^[a-zA-Z0-9\-]$/.test(char)) {
+              this.chars.push(char);
+            } else {
+              return this.quit();
+            }
         }
         break;
     }

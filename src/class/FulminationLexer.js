@@ -71,12 +71,12 @@ class FulminationLexer extends Lexer {
         switch (char) {
           case ';':
             this.appendTokenChars('format');
-            this.appendToken(char, 'semicolon');
+            this.appendToken('semicolon', char);
             this.status = 0;
             break;
           case ':':
             this.appendTokenChars('format');
-            this.appendToken(char, 'colon');
+            this.appendToken('colon', char);
             this.status = 0;
             break;
           case '(':

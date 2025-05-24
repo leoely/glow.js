@@ -22,7 +22,7 @@ class YamlLexer extends Lexer {
             break;
           case '-':
             this.chars = [];
-            this.appendToken(char, 'dash');
+            this.appendToken('dash', char);
             this.status = 4;
             break;
           case ':':
@@ -35,22 +35,24 @@ class YamlLexer extends Lexer {
         switch (char) {
           case ':':
             this.appendTokenChars('key');
-            this.appendToken(char, 'colon');
+            this.appendToken('colon', char);
             this.status = 0;
-            break;
-          case '':
-          case '\n':
-            this.appendTokenChars('value');
             break;
           case '(':
             this.appendTokenChars('value');
             this.prepareChars(char);
             this.status = 3;
             break;
+          case '':
+          case '\n':
           case ' ':
             return this.quit();
           default:
-            this.chars.push(char);
+            if (/^[a-zA-Z0-9\-]$/.test(char)) {
+              this.chars.push(char);
+            } else {
+              return this.quit();
+            }
         }
         break;
       case 2:
@@ -79,14 +81,17 @@ class YamlLexer extends Lexer {
       case 4:
         switch (char) {
           case ' ':
-            break;
           case '':
           case '\n':
             this.appendTokenChars('value');
             this.status = 0;
             break;
           default:
-            this.chars.push(char);
+            if (/^[a-zA-Z0-9\-]$/.test(char)) {
+              this.chars.push(char);
+            } else {
+              return this.quit();
+            }
         }
         break;
     }

@@ -1,4 +1,4 @@
-import Lexer from '~/class/Lexer';
+import Lexer from './Lexer';
 
 class ShellLexer extends Lexer {
   constructor(...params) {

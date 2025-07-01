@@ -1,8 +1,8 @@
 import Lexer from '~/class/Lexer';
 
 class LocationLexer extends Lexer {
-  constructor(...param) {
-    super(...param);
+  constructor(...params) {
+    super(...params);
   }
 
   dealFile() {

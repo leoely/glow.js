@@ -1,8 +1,8 @@
 import Lexer from '~/class/Lexer'
 
 class VersionLexer extends Lexer {
-  constructor(...param) {
-    super(...param);
+  constructor(...params) {
+    super(...params);
   }
 
   scan(char) {

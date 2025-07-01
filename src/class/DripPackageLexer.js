@@ -1,8 +1,8 @@
 import Lexer from './Lexer';
 
 class DripPackageLexer extends Lexer {
-  constructor(...param) {
-    super(...param);
+  constructor(...params) {
+    super(...params);
   }
 
   scan(char) {

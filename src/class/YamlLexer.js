@@ -1,8 +1,8 @@
-import Lexer from '~/class/Lexer';
+import Lexer from './Lexer';
 
 class YamlLexer extends Lexer {
-  constructor(...param) {
-    super(...param);
+  constructor(...params) {
+    super(...params);
   }
 
   scan(char) {

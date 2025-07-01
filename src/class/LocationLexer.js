@@ -42,12 +42,21 @@ class LocationLexer extends Lexer {
             this.appendToken('dot', char);
             this.status = 1;
             break;
+          case ':':
+            this.chars = [];
+            this.appendToken('colon', char);
+            this.status = 13;
+            break;
           case '/':
             this.appendToken('slash', char);
             this.prepareEmptyCharsAndJump(3);
             break;
           default:
-            this.prepareCharsAndJump(char, 4);
+            if (char >= '0' && char <= '9') {
+              this.prepareCharsAndJump(char, 12);
+            } else {
+              this.prepareCharsAndJump(char, 4);
+            }
         }
         break;
       case 1:
@@ -107,7 +116,29 @@ class LocationLexer extends Lexer {
         switch(char) {
           case ':':
             this.appendTokenChars('protocol');
-            this.appendTokenAndJump('colon', char, 5);
+            const lastToken = this.getReciprocalToken(1);
+            const { elem, } = lastToken;
+            switch (elem) {
+              case 'http':
+              case 'https':
+                this.appendTokenAndJump('colon', char, 5);
+                break;
+              default: {
+                if (/^[0-9a-f]*$/.test(elem)) {
+                  const value = parseInt(elem, 16);
+                  if (value >= 0 && value <= 65536) {
+                    lastToken.type = 'ipv6Subnet';
+                    this.status = 13;
+                  } else {
+                    this.ans.pop();
+                    return this.quit();
+                  }
+                } else {
+                  this.ans.pop();
+                  return this.quit();
+                }
+              }
+            }
             break;
           case '':
             this.dealFile();
@@ -203,6 +234,64 @@ class LocationLexer extends Lexer {
             return this.createTokenChars('hiddenDirectory');
           default:
             if (/^[a-zA-Z0-9\-]$/.test(char)) {
+              this.chars.push(char);
+            } else {
+              return this.quit();
+            }
+        }
+        break;
+      case 12:
+        switch (char) {
+          case '':
+          case ' ': {
+            const { parts, } = this;
+            if (parts === 3) {
+              this.appendTokenChars('ipv4Subnet');
+            } else {
+              return this.quit();
+            }
+            break;
+          }
+          case '.':
+            this.appendTokenChars('ipv4Subnet');
+            const ipv4Subnet = parseInt(this.getReciprocalToken(1).elem);
+            if (ipv4Subnet >= 0 && ipv4Subnet <= 255) {
+              if (this.parts === undefined) {
+                this.parts = 1;
+              } else {
+                this.parts += 1;
+              }
+              this.appendToken('dot', char);
+            } else {
+              this.ans.pop();
+              return this.quit();
+            }
+            break;
+          case ':':
+            this.appendTokenChars('ipv6Subnet');
+            this.appendTokenAndJump('colon', char, 13);
+            break;
+          default:
+            if (char >= '0' && char <= '9') {
+              this.chars.push(char);
+            } else {
+              return this.quit();
+            }
+        }
+        break;
+      case 13:
+        switch (char) {
+          case '':
+          case ' ': {
+            this.appendTokenChars('ipv6Subnet');
+            break;
+          }
+          case ':':
+            this.appendTokenChars('ipv6Subnet');
+              this.appendToken('colon', char);
+            break;
+          default:
+            if (/^[0-9a-f]$/.test(char)) {
               this.chars.push(char);
             } else {
               return this.quit();

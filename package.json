@@ -1,11 +1,11 @@
 {
   "name": "glow.js",
-  "version": "1.0.5",
+  "version": "1.0.11",
   "description": "Frontend highlight project.",
   "main": "dist/index.js",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/leoely/highlight.git"
+    "url": "git+ssh://git@github.com/leoely/glow.js.git"
   },
   "author": "Leo Ely",
   "license": "MIT",

@@ -4,3 +4,4 @@ export { default as ShellLexer, } from '~/class/ShellLexer';
 export { default as VersionLexer, }from '~/class/VersionLexer';
 export { default as YamlLexer, } from '~/class/VersionLexer';
 export { default as FulminationLexer, } from '~/class/FulminationLexer';
+export { default as NumberLexer, } from '~/class/NumberLexer';

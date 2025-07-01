@@ -23,7 +23,6 @@ class NumberLexer extends Lexer {
             break;
           case '\'':
           case ',':
-          case '.':
           case '_': {
             const { length, } = this.chars;
             if (length >= 1 && length <= 3) {
@@ -50,14 +49,17 @@ class NumberLexer extends Lexer {
             break;
           case '\'':
           case ',':
-          case '.':
           case '_':
             if (this.chars.length === 3) {
               this.appendTokenChars('number');
-              this.appendTokenAndJump('separator', char, 2);
+              this.appendToken('separator', char);
             } else {
               return this.quit();
             }
+            break;
+          case '.':
+            this.appendTokenChars('number');
+            this.appendToken('point', char);
             break;
           default:
             if (char >= '0' && char <= '9') {

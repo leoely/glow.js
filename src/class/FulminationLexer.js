@@ -101,6 +101,7 @@ class FulminationLexer extends Lexer {
           case ')':
           case '[':
           case ']':
+          case '|':
           case '+':
           case ':':
           case ';':

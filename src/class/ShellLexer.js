@@ -1,5 +1,7 @@
 import Lexer from './Lexer';
 
+let location = 0;
+
 class ShellLexer extends Lexer {
   constructor(...params) {
     super(...params);
@@ -42,6 +44,7 @@ class ShellLexer extends Lexer {
       switch (char) {
         case '':
         case ' ':
+          location = 0;
           return this.createTokenChars('identifer');
         default:
           this.chars.push(char);
@@ -52,17 +55,18 @@ class ShellLexer extends Lexer {
 
   getReserve(char, letter, set) {
     switch (char) {
+      case '':
+      case '|':
       case letter:
       case ';':
-      case '':
       case '(':
       case '{':
       case ':':
       case '&':
-      case '|':
       case ' ':
       case '.':
       case '\n':
+        location = 0;
         return this.createTokenChars(set);
       default:
         this.identifer = true;
@@ -71,14 +75,27 @@ class ShellLexer extends Lexer {
     }
   }
 
+  generateCommandToken() {
+    if (location === 0) {
+      return this.createTokenChars('command');
+    } else {
+      return this.createTokenChars('subCommand');
+    }
+  }
+
   scan(char) {
     const { status, } = this;
     switch (status) {
       case 0:
         switch (char) {
+          case '':
+            location = 0;
+            break;
           case '|':
+            location = 0;
             return this.createToken('or', '|');
           case '&':
+            location = 0;
             return this.createToken('and', '&');
           case '(':
             return this.createToken('bracket', '(');
@@ -120,6 +137,7 @@ class ShellLexer extends Lexer {
               this.appendToken('doubleQuote', char);
               this.prepareEmptyCharsAndJump(5);
             } else {
+              location = 0;
               return this.quit();
             }
             break;
@@ -128,8 +146,12 @@ class ShellLexer extends Lexer {
               this.appendToken('singleQuote', char);
               this.prepareEmptyCharsAndJump(6);
             } else {
+              location = 0;
               return this.quit();
             }
+            break;
+          case 'b':
+            this.prepareCharsAndJump(char, 49);
             break;
           case 'c':
             this.prepareCharsAndJump(char, 12);
@@ -166,13 +188,15 @@ class ShellLexer extends Lexer {
             this.status = 2;
             break;
           default:
+            location = 0;
             return this.quit();
         }
         break;
       case 2: {
         switch (char) {
-          case '\n':
           case '':
+          case '\n':
+            location = 0;
             return this.createTokenChars('hashbangComment');
           default:
             this.chars.push(char);
@@ -181,14 +205,22 @@ class ShellLexer extends Lexer {
       }
       case 3:
         switch (char) {
+          case ' ': {
+            const ans = this.generateCommandToken();
+            location += 1;
+            return ans;
+          }
           case '':
-          case ' ':
-          case '\n':
-            return this.createTokenChars('command');
+          case '\n': {
+            const ans = this.generateCommandToken();
+            location = 0;
+            return ans;
+          }
           default:
             if (/^[a-zA-Z]$/.test(char)) {
               this.chars.push(char);
             } else {
+              location = 0;
               return this.quit();
             }
         }
@@ -197,6 +229,7 @@ class ShellLexer extends Lexer {
         if (/^[a-zA-Z]$/.test(char)) {
           this.chars.push(char);
         } else {
+          location = 0;
           return this.createTokenChars('option');
         }
         break;
@@ -205,6 +238,7 @@ class ShellLexer extends Lexer {
           case '"':
             this.appendTokenChars('string');
             this.appendToken('doubleQuote', char);
+            location = 0;
             return this.quit();
           default:
             this.chars.push(char);
@@ -215,6 +249,7 @@ class ShellLexer extends Lexer {
           case "'":
             this.appendTokenChars('string');
             this.appendToken('singleQuote', char);
+            location = 0;
             return this.quit();
           default:
           this.chars.push(char);
@@ -232,6 +267,7 @@ class ShellLexer extends Lexer {
         if (/^[a-zA-Z]$/.test(char)) {
           this.chars.push(char);
         } else {
+          location = 0;
           return this.createTokenChars('variable');
         }
         break;
@@ -240,6 +276,7 @@ class ShellLexer extends Lexer {
           this.chars.push(char);
           this.status = 4;
         } else {
+          location = 0;
           return this.createToken('centerLine', '-');
         }
         break;
@@ -257,9 +294,10 @@ class ShellLexer extends Lexer {
         return this.readReserveLetter(char, 'o', 17);
       case 17:
         switch (char) {
+          case '':
           case ' ':
           case '\n':
-          case '':
+            location = 0;
             return this.createTokenChars('do');
           case 'n':
             this.chars.push(char);
@@ -304,10 +342,12 @@ class ShellLexer extends Lexer {
           ['o',  31],
         ]);
       case 30:
+        location = 0;
         return this.getReserve(char, '\n', 'fi');
       case 31:
         return this.readReserveLetter(char, 'r', 32);
       case 32:
+        location = 0;
         return this.getReserve(char, '\n', 'for');
       case 33:
         return this.readReserveLetters(char, [
@@ -344,6 +384,16 @@ class ShellLexer extends Lexer {
         return this.readReserveLetter(char, 'l', 48);
       case 48:
         return this.readReserveLetter(char, 'e', 11);
+      case 49:
+        return this.readReserveLetter(char, 'r', 50);
+      case 50:
+        return this.readReserveLetter(char, 'e', 51);
+      case 51:
+        return this.readReserveLetter(char, 'a', 52);
+      case 52:
+        return this.readReserveLetter(char, 'k', 53);
+      case 53:
+        return this.getReserve(char, '\n', 'break');
     }
   }
 }

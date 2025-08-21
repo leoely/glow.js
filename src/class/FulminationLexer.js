@@ -60,6 +60,8 @@ class FulminationLexer extends Lexer {
           case '"':
             this.prepareCharsAndJump(char, 2);
             break;
+          case ' ':
+            return this.quit();
           case '\n':
             break;
           default:
@@ -80,11 +82,34 @@ class FulminationLexer extends Lexer {
             this.status = 0;
             break;
           case '(':
+            this.appendTokenChars('text');
+            this.appendToken('parenthese', char);
+            this.status = 0;
+            break;
           case '[':
+            this.appendTokenChars('text');
+            this.appendToken('squareParenthese', char);
+            this.status = 0;
+            break;
           case '|':
+            this.appendTokenChars('text');
+            this.appendToken('line', char);
+            this.status = 0;
+            break;
           case '*':
+            this.appendTokenChars('text');
+            this.appendToken('asterisk', char);
+            this.status = 0;
+            break;
           case '"':
+            this.appendTokenChars('text');
+            this.prepareCharsAndJump(char, 2);
+            break;
           case '&':
+            this.appendTokenChars('text');
+            this.appendToken('and', char);
+            this.status = 0;
+            break;
           case ' ':
           case '':
           case '\n':

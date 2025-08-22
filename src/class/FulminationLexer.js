@@ -65,7 +65,11 @@ class FulminationLexer extends Lexer {
           case '\n':
             break;
           default:
-            this.prepareCharsAndJump(char, 1);
+            if (char >= '0' && char <= '9') {
+              this.prepareCharsAndJump(char, 6);
+            } else {
+              this.prepareCharsAndJump(char, 1);
+            }
         }
         break;
       }
@@ -207,6 +211,14 @@ class FulminationLexer extends Lexer {
             this.chars.push(char);
             FulminationLexer.head = false;
           }
+        }
+        break;
+      case 6:
+        this.chars.push(char);
+        if (char === '&') {
+          this.createTokenChars('and');
+        } else {
+          this.status = 1;
         }
         break;
     }

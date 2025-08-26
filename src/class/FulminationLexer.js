@@ -151,6 +151,8 @@ class FulminationLexer extends Lexer {
               FulminationLexer.head = true;
               this.chars.push(char);
               this.status = 5;
+            } else {
+              return this.quit();
             }
         }
         break;
@@ -202,7 +204,8 @@ class FulminationLexer extends Lexer {
             this.chars.push(char);
             return this.createTokenChars('escape');
           case ' ':
-            return this.createTokenChars('escape');
+            this.appendTokenChars('escape');
+            break;
           default: {
             const { chars, } = this;
             if (!Array.isArray(chars)) {

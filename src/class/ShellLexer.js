@@ -272,7 +272,7 @@ class ShellLexer extends Lexer {
         }
         break;
       case 9:
-        if (/^[a-zA-Z]$/.test(char)) {
+        if (/^[a-zA-Z\-]$/.test(char)) {
           this.chars.push(char);
           this.status = 4;
         } else {

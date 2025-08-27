@@ -5,7 +5,7 @@ class LocationLexer extends Lexer {
     super(...params);
   }
 
-  dealFile() {
+  dealFile(code) {
     const { chars, } = this;
     const filenameChars = [];
     const { length, } = chars;
@@ -20,12 +20,18 @@ class LocationLexer extends Lexer {
       }
     }
     const { filename, } = this;
+    delete this.filename;
     if (filename === true) {
       this.appendToken('filename', filenameChars.join(''));
       this.appendToken('dot', '.');
       return this.createTokenChars('format');
     } else {
-      return this.createToken('namespace', filenameChars.join(''));
+      switch (code) {
+        case 0:
+          return this.createToken('namespace', filenameChars.join(''));
+        case 1:
+          return this.quit();
+      }
     }
   }
 
@@ -107,7 +113,7 @@ class LocationLexer extends Lexer {
           case '':
           case ' ':
           case '\n':
-            return this.dealFile();
+            return this.dealFile(0);
           default:
             this.chars.push(char);
         }
@@ -141,10 +147,9 @@ class LocationLexer extends Lexer {
             }
             break;
           case '':
-            this.dealFile();
-            break;
+            return this.dealFile(0);
           case ' ':
-            return this.quit();
+            return this.dealFile(1);
           default:
             if (/^[a-zA-Z0-9\-\.]$/.test(char)) {
               this.chars.push(char);
@@ -217,7 +222,7 @@ class LocationLexer extends Lexer {
             break;
           case '':
           case ' ':
-            this.dealFile();
+            this.dealFile(0);
           default:
             this.chars.push(char);
         }

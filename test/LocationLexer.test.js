@@ -7,6 +7,7 @@ describe('[class] LocationLexer', () => {
   test('LocationLexer parse result should be correct.', () => {
     const highLight = new HighLight();
     highLight.addLexer(LocationLexer);
+    expect(JSON.stringify(highLight.parse('text.fulmination'))).toMatch('[{\"type\":\"filename\",\"elem\":\"text\"},{\"type\":\"dot\",\"elem\":\".\"},{\"type\":\"format\",\"elem\":\"fulmination\"}]');
     expect(JSON.stringify(highLight.parse('.drip/local'))).toMatch('[{\"type\":\"hiddenDirectory\",\"elem\":\".drip\"},{\"type\":\"slash\",\"elem\":\"/\"},{\"type\":\"namespace\",\"elem\":\"local\"}]');
     expect(JSON.stringify(highLight.parse('.git'))).toMatch('[{\"type\":\"hiddenDirectory\",\"elem\":\".git\"}]');
     expect(JSON.stringify(highLight.parse('/tmp/test/.git'))).toMatch('[{\"type\":\"slash\",\"elem\":\"/\"},{\"type\":\"namespace\",\"elem\":\"tmp\"},{\"type\":\"slash\",\"elem\":\"/\"},{\"type\":\"namespace\",\"elem\":\"test\"},{\"type\":\"slash\",\"elem\":\"/\"},{\"type\":\"hiddenDirectory\",\"elem\":\".git\"}]');

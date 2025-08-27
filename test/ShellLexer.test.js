@@ -21,5 +21,6 @@ describe('[class] ShellLexer', () => {
     expect(JSON.stringify(highLight.parse('npm ins fulmination'))).toMatch('[{\"type\":\"command\",\"elem\":\"npm\"},{\"type\":\" \"},{\"type\":\"subCommand\",\"elem\":\"ins\"},{\"type\":\" \"},{\"type\":\"subCommand\",\"elem\":\"fulmination\"}]');
     highLight.addLexer(LocationLexer);
     expect(JSON.stringify(highLight.parse('fulmination parse text.fulmination'))).toMatch('[{\"type\":\"command\",\"elem\":\"fulmination\"},{\"type\":\" \"},{\"type\":\"subCommand\",\"elem\":\"parse\"},{\"type\":\" \"},{\"type\":\"filename\",\"elem\":\"text\"},{\"type\":\"dot\",\"elem\":\".\"},{\"type\":\"format\",\"elem\":\"fulmination\"}]');
+    expect(JSON.stringify(highLight.parse('fulmination minify text.fulmination --output mini.fulmination'))).toMatch('[{\"type\":\"command\",\"elem\":\"fulmination\"},{\"type\":\" \"},{\"type\":\"subCommand\",\"elem\":\"minify\"},{\"type\":\" \"},{\"type\":\"filename\",\"elem\":\"text\"},{\"type\":\"dot\",\"elem\":\".\"},{\"type\":\"format\",\"elem\":\"fulmination\"},{\"type\":\" \"},{\"type\":\"option\",\"elem\":\"--output\"},{\"type\":\" \"},{\"type\":\"filename\",\"elem\":\"mini\"},{\"type\":\"dot\",\"elem\":\".\"},{\"type\":\"format\",\"elem\":\"fulmination\"}]');
   });
 });

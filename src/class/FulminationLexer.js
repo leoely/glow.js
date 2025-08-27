@@ -38,25 +38,25 @@ class FulminationLexer extends Lexer {
       case 0: {
         switch (char) {
           case '&':
-            return this.createToken('and', char);
+            return this.appendToken('and', char);
           case '+':
-            return this.createToken('plus', char);
+            return this.appendToken('plus', char);
           case '(':
-            return this.createToken('parenthese', char);
+            return this.appendToken('parenthese', char);
           case ')':
-            return this.createToken('parenthese', char);
+            return this.appendToken('parenthese', char);
           case '[':
-            return this.createToken('squareParenthese', char);
+            return this.appendToken('squareParenthese', char);
           case ']':
-            return this.createToken('squareParenthese', char);
+            return this.appendToken('squareParenthese', char);
           case ';':
-            return this.createToken('semicolon', char);
+            return this.appendToken('semicolon', char);
           case ':':
-            return this.createToken('colon', char);
+            return this.appendToken('colon', char);
           case '*':
-            return this.createToken('asterisk', char);
+            return this.appendToken('asterisk', char);
           case '|':
-            return this.createToken('line', char);
+            return this.appendToken('line', char);
           case '"':
             this.prepareCharsAndJump(char, 2);
             break;

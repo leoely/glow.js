@@ -49,6 +49,11 @@ class FulminationLexer extends Lexer {
             return this.appendToken('squareParenthese', char);
           case ']':
             return this.appendToken('squareParenthese', char);
+          case '<':
+            return this.appendToken('angleBracket', char);
+          case '>':
+            FulminationLexer.same = true;
+            return this.appendToken('angleBracket', char);
           case ';':
             return this.appendToken('semicolon', char);
           case ':':
@@ -80,11 +85,17 @@ class FulminationLexer extends Lexer {
             this.appendToken('semicolon', char);
             this.status = 0;
             break;
-          case ':':
+          case ':': {
             this.appendTokenChars('format');
             this.appendToken('colon', char);
-            this.status = 0;
+            const { same, } = FulminationLexer;
+            if (same === true) {
+              this.status = 7;
+            } else {
+              this.status = 0;
+            }
             break;
+          }
           case '(':
             this.appendTokenChars('text');
             this.appendToken('parenthese', char);
@@ -98,6 +109,11 @@ class FulminationLexer extends Lexer {
           case '|':
             this.appendTokenChars('text');
             this.appendToken('line', char);
+            this.status = 0;
+            break;
+          case '<':
+            this.appendTokenChars('text');
+            this.appendToken('angleBracket', char);
             this.status = 0;
             break;
           case '*':
@@ -130,6 +146,8 @@ class FulminationLexer extends Lexer {
           case ')':
           case '[':
           case ']':
+          case '<':
+          case '>':
           case '|':
           case '+':
           case ':':
@@ -222,6 +240,22 @@ class FulminationLexer extends Lexer {
           this.createTokenChars('and');
         } else {
           this.status = 1;
+        }
+        break;
+      case 7:
+        switch (char) {
+          case '':
+            delete FulminationLexer.same;
+            return this.createTokenChars('text');
+          case '\n':
+          case ' ':
+            this.appendTokenChars('text');
+            break;
+          case '*':
+            this.appendToken('asterisk', char);
+            break;
+          default:
+            this.chars.push(char);
         }
         break;
     }
